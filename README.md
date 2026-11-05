@@ -19,7 +19,7 @@ players from Horizon, with positional sound, push to talk, and a familiar voice
 settings menu. This is a native **`.hnmod`**, built into the client by Horizon
 Launcher. It is written in Rust, not a Fabric or NeoForge JAR.
 
-> **0.5.1 · Horizon native API 411 or newer**
+> **0.5.2 · Horizon native API 411 or newer**
 > The Hooks/Host integration uses officially registered Horizon APIs. Download
 > the `.hnmod` from [Releases](https://github.com/rison1337/horizon-plasmo-voice/releases).
 > One package includes both Linux x86_64 and Windows x64 runtimes.
@@ -34,7 +34,7 @@ Launcher. It is written in Rust, not a Fabric or NeoForge JAR.
   the mod menu. Losing window focus clears the held key.
 - **Clear indicators:** your microphone state stays above interfaces. Pixel
   icons follow other players' heads, account for helmets, and disappear behind
-  obstructing blocks.
+  obstructing blocks. Servers without Plasmo Voice do not show a connection icon.
 - **Player controls:** individual volume and mute, source/channel levels, and
   Shift + RMB + mouse wheel adjustment. Player gain multiplies the proximity level.
 - **Six settings tabs:** Devices, Volume, Activation, Overlay, Advanced, Hotkeys.

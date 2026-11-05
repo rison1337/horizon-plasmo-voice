@@ -1,5 +1,24 @@
 # API adapter validation, 5 November 2026
 
+## 0.5.2 connection indicators, 6 November 2026
+
+Six adapter regressions pass against public core
+`d52ff7a6f783a164043549f5f04645d5324d0d8a` (API 411), including captured HUD
+draws for ordinary servers, real connection attempts, timeout/error, listen-only
+and PTT states. All 23 engine tests pass, including encrypted UDP loopback and
+a deterministic silent-server / stalled-handshake / delayed-endpoint regression.
+Engine/adapter Clippy and the Windows x64 adapter cross-check pass.
+Only a real handshake animates; the TCP/configuration deadline is 15 seconds.
+The earlier multi-version and platform checks below retain their original scope.
+
+Two fresh isolated Linux clients on the optimized build also passed live LAN
+checks without a voice plugin: no activation icon at idle, while physical PTT
+was held, or after 16 seconds. Diagnostics stayed `Waiting` with audio devices
+closed. Physical Shift + RMB + wheel, both Shift keys, volume indicator expiry,
+hotbar behavior, bounds and blocked targets also passed again. Test clients and
+their private display were stopped. Audio was disabled for these UI checks.
+[Results](https://github.com/rison1337/horizon-plasmo-voice/blob/v0.5.2/docs/validation/connection-0.5.2.json).
+
 ## 0.5.1 input adjustment
 
 The registered API 411 build passes five adapter regressions and Clippy with

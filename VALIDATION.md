@@ -3,6 +3,35 @@
 Recorded on **5 November 2026** for the 0.5.0 API adapter. These are completed
 checks, not a claim that every platform or audio device has been tested.
 
+## 0.5.2 connection indicators
+
+Six adapter regressions pass on registered API 411 core
+`d52ff7a6f783a164043549f5f04645d5324d0d8a`. The added rendering regression
+checks that a server with no voice handshake paints no activation icon, even
+while PTT/mute is held; actual connection, timeout/error, listen-only, idle and
+held-PTT states paint the appropriate distinct indicators.
+Engine and adapter Clippy pass with warnings denied. The Windows x64 adapter
+cross-check also passes; this does not test Windows GUI or audio devices.
+
+All **23 engine tests** pass, including the existing real UDP/encrypted audio
+loopback. The new deterministic session regression advances the network clock
+to check silent servers, the TCP handshake's 15-second deadline before any UDP
+socket exists, no repeated timeout events, delayed voice endpoints, and cleanup
+when UDP negotiation stalls. Ordinary servers remain idle and can still accept
+later voice handshakes instead of caching a permanent absence verdict.
+
+The 0.5.0 five-version matrix and the 0.5.1 CPU/input checks below remain
+historical records. This update changes connection state and HUD behavior; it
+does not claim another five-server matrix or physical Windows audio testing.
+
+Two fresh isolated Linux clients on the optimized build also passed live LAN
+checks without a voice plugin: no activation icon at idle, while physical PTT
+was held, or after 16 seconds. Diagnostics stayed `Waiting` with audio devices
+closed. Physical Shift + RMB + wheel, both Shift keys, volume indicator expiry,
+hotbar behavior, bounds and blocked targets also passed again. Test clients and
+their private display were stopped. Audio was disabled for these UI checks.
+[Results](https://github.com/rison1337/horizon-plasmo-voice/blob/v0.5.2/docs/validation/connection-0.5.2.json).
+
 ## 0.5.1 player-volume controls
 
 The adapter now requires Shift + the configured action key (RMB by default) +

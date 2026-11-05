@@ -1,13 +1,13 @@
 # Publishing checklist and prepared catalog entry
 
 The owner authorized public source and a catalog submission after Horizon
-PR #9812 merged. Version 0.5.1 uses the official native API minimum **411**.
+PR #9812 merged. Version 0.5.2 uses the official native API minimum **411**.
 The files under `publishing/horizon-mods/` are the submission material. Catalog
 acceptance is a separate maintainer decision; a GitHub Release alone does not
 make the mod appear in Horizon Launcher.
 
 The source is public and the normal
-[v0.5.1 release](https://github.com/rison1337/horizon-plasmo-voice/releases/tag/v0.5.1)
+[v0.5.2 release](https://github.com/rison1337/horizon-plasmo-voice/releases/tag/v0.5.2)
 is published. [Catalog PR #305](https://github.com/horizon-rust/horizon-mods/pull/305)
 contains the entry, icon and local check results. It requests the reviewer's
 required staging upload; neither the release nor this submission claims catalog
@@ -54,6 +54,14 @@ image for publication instead of changing this repository's visibility.
 Reference: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/customizing-your-repositorys-social-media-preview
 
 ## Release notes
+
+**0.5.2 — connection indicators**
+
+- Hides the activation HUD until the server starts a real Plasmo Voice handshake.
+- Limits stalled handshake stages to 15 seconds; timeout/error and listen-only
+  operation use static warnings. Delayed server handshakes remain supported.
+- Six adapter regressions and all 23 engine tests pass, including real encrypted
+  UDP loopback. Earlier voice-version and CPU checks keep their original scope.
 
 **0.5.1 — player-volume controls**
 

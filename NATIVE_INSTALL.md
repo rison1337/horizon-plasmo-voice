@@ -2,8 +2,8 @@
 
 ## Current status
 
-Download `plasmo-voice-0.5.1.hnmod` from
-[Releases](https://github.com/rison1337/horizon-plasmo-voice/releases/tag/v0.5.1).
+Download `plasmo-voice-0.5.2.hnmod` from
+[Releases](https://github.com/rison1337/horizon-plasmo-voice/releases/tag/v0.5.2).
 Use a Horizon Nightly with native API **411 or newer**. Both required extensions
 are officially registered by [Horizon PR #9812](https://github.com/horizon-rust/horizon/pull/9812).
 The release records the tested public Horizon commit

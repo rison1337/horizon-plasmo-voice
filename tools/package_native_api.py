@@ -16,7 +16,7 @@ import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
 MIXINS = "e8cd0aa38cffef49cb2e088ef716baa107148c02"
-VERSION = "0.5.1"
+VERSION = "0.5.2"
 REQUIRED_HOOKS = {"gui_render_post", "client_disconnecting", "client_stopping", "menu_background"}
 REQUIRED_HELPERS = {"client_state", "client_entities", "client_heads", "client_profiles",
                     "client_visual_clear", "client_block_obstruction", "gui_paint",

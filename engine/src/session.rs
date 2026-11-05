@@ -679,7 +679,7 @@ impl Worker {
                     Ok(Command::Control(data)) => self.control(&data)?,
                 }
             }
-            self.network()?;
+            self.network(Instant::now())?;
             self.record()?;
             let now = Instant::now();
             if now >= self.playout {
@@ -716,6 +716,13 @@ impl Worker {
         }
         match packet {
             Control::PlayerInfoRequest => {
+                if matches!(
+                    self.status,
+                    Status::Waiting | Status::TimedOut | Status::Error
+                ) {
+                    self.connected_at = Instant::now();
+                    self.status(Status::Connecting)?;
+                }
                 if self.key.is_none() {
                     self.key = Some((self.key_factory)()?);
                 }
@@ -1015,11 +1022,23 @@ impl Worker {
         }
         // Capture opens only after a user presses PTT, in record().
     }
-    fn network(&mut self) -> Result<()> {
+    fn network(&mut self, now: Instant) -> Result<()> {
+        // Cover the TCP key/config handshake too: there may not be a UDP
+        // socket yet, or a pinging endpoint may never send its configuration.
+        if self.status == Status::Connecting
+            && now.duration_since(self.connected_at) >= Duration::from_secs(15)
+        {
+            self.end_talk()?;
+            self.capture = None;
+            self.output = None;
+            self.socket = None;
+            self.speakers.clear();
+            self.status(Status::TimedOut)?;
+            return Ok(());
+        }
         let Some(socket) = self.socket.as_ref() else {
             return Ok(());
         };
-        let now = Instant::now();
         if now.duration_since(self.last_ping) >= Duration::from_millis(500) {
             let endpoint = self
                 .config
@@ -1151,7 +1170,9 @@ impl Worker {
                 Err(e) => {
                     self.view.level = 0.;
                     self.emit(Event::Error(e))?;
-                    self.status(Status::ListenOnly)?;
+                    if self.config.is_some() {
+                        self.status(Status::ListenOnly)?;
+                    }
                     self.talking.store(false, Ordering::Relaxed);
                     self.capture_retry = Instant::now() + Duration::from_secs(3);
                     return Ok(());
@@ -1172,7 +1193,9 @@ impl Worker {
             self.capture = None;
             self.capture_retry = Instant::now() + Duration::from_secs(3);
             self.end_talk()?;
-            self.status(Status::ListenOnly)?;
+            if self.config.is_some() {
+                self.status(Status::ListenOnly)?;
+            }
             return Ok(());
         }
         capture.set_transmitting(sampling);
@@ -1548,4 +1571,86 @@ pub fn timestamp() -> u64 {
         .duration_since(UNIX_EPOCH)
         .unwrap_or_default()
         .as_millis() as u64
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    struct TestKey;
+    impl KeyPair for TestKey {
+        fn public_der(&self) -> Vec<u8> {
+            vec![1, 2, 3]
+        }
+        fn decrypt(&self, _: &[u8]) -> Result<Vec<u8>> {
+            Err("unused in handshake timeout test".into())
+        }
+    }
+
+    #[test]
+    fn silent_servers_stay_idle_and_stalled_handshakes_expire_but_accept_late_replies() {
+        let (_, commands) = mpsc::sync_channel(128);
+        let (events, received) = mpsc::sync_channel(128);
+        let mut worker = Worker::new(
+            "127.0.0.1".into(),
+            || Ok(Box::new(TestKey)),
+            |_, _| 2,
+            Settings::default(),
+            false,
+            commands,
+            events,
+            Arc::default(),
+            Arc::default(),
+            Arc::default(),
+            Arc::default(),
+            Arc::default(),
+            Arc::default(),
+        );
+        worker
+            .network(Instant::now() + Duration::from_secs(60))
+            .unwrap();
+        assert!(received.try_iter().next().is_none());
+        assert_eq!(worker.status, Status::Waiting);
+        assert!(worker.socket.is_none());
+
+        worker.control(&[2]).unwrap();
+        assert!(matches!(
+            received.try_recv(),
+            Ok(Event::Status(Status::Connecting))
+        ));
+        assert!(matches!(received.try_recv(), Ok(Event::Tcp(_))));
+        let started = worker.connected_at;
+        worker.network(started + Duration::from_secs(14)).unwrap();
+        assert!(received.try_iter().next().is_none());
+        worker.network(started + Duration::from_secs(15)).unwrap();
+        assert!(matches!(
+            received.try_recv(),
+            Ok(Event::Status(Status::TimedOut))
+        ));
+        worker.network(started + Duration::from_secs(60)).unwrap();
+        assert!(received.try_iter().next().is_none());
+
+        // A delayed server/proxy can still start a real handshake after the
+        // initial deadline. No permanent "server has no mod" verdict is cached.
+        let endpoint = UdpSocket::bind("127.0.0.1:0").unwrap();
+        let mut connection = crate::wire::Writer::default();
+        connection.u8(1);
+        connection.uuid(1);
+        connection.utf("127.0.0.1").unwrap();
+        connection.i32(endpoint.local_addr().unwrap().port() as i32);
+        worker.control(&connection.0).unwrap();
+        assert!(matches!(
+            received.try_recv(),
+            Ok(Event::Status(Status::Connecting))
+        ));
+        assert!(worker.socket.is_some());
+        worker
+            .network(worker.connected_at + Duration::from_secs(15))
+            .unwrap();
+        assert!(matches!(
+            received.try_recv(),
+            Ok(Event::Status(Status::TimedOut))
+        ));
+        assert!(worker.socket.is_none());
+    }
 }

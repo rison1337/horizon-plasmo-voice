@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.5.2 — 2026-11-06
+
+- Hides the activation HUD on ordinary servers until a Plasmo Voice handshake
+  actually arrives, including while PTT or mute is held.
+- Animates the connection icon only during a real handshake. A stalled
+  key/configuration exchange stops after 15 seconds and shows a static warning.
+- Shows a static microphone warning for listen-only operation instead of a
+  connection animation. Microphone preview errors do not mark an ordinary
+  server as voice-enabled.
+- Keeps accepting delayed voice handshakes after a stalled attempt.
+
 ## 0.5.1 — 2026-11-05
 
 - Requires Shift + the action key (RMB by default) + scroll to adjust a targeted

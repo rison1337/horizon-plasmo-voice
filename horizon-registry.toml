@@ -10,6 +10,7 @@ An unofficial, independently written Rust client compatible with Plasmo Voice 2.
 - Six settings tabs, device selection, microphone preview, and per-player/source volume and mute.
 - Shift + RMB + scroll adjusts a targeted player; its volume indicator appears only after an actual change.
 - Pixel head icons with current-frame positioning, helmet clearance and block-shape visibility.
+- No connection indicator on servers without Plasmo Voice; stalled handshakes stop animating.
 - One native .hnmod with Linux x86_64 and Windows x64 runtimes; English and Russian UI.
 
 The launcher compiles the mod into the game. It communicates with the connected server's advertised voice endpoint, uses the selected audio devices, and keeps per-instance settings. It does not implement or enable Minecraft older-version adapters.

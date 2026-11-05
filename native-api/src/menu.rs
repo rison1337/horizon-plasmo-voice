@@ -1584,6 +1584,7 @@ enum VoiceIcon {
     Microphone,
     ClientMute,
     ServerMute,
+    InputUnavailable,
     Connection,
     Speaker,
     PlayerMute,
@@ -1620,6 +1621,7 @@ fn voice_icon_grid(
         VoiceIcon::Microphone => (Glyph::Microphone, Mark::Talking(art::phase())),
         VoiceIcon::ClientMute => (Glyph::Microphone, Mark::Muted),
         VoiceIcon::ServerMute => (Glyph::Microphone, Mark::Locked),
+        VoiceIcon::InputUnavailable => (Glyph::Microphone, Mark::Missing),
         VoiceIcon::Connection => (Glyph::Headphones, Mark::Connecting(art::phase())),
         VoiceIcon::Speaker => (Glyph::Microphone, Mark::Talking(art::phase())),
         VoiceIcon::PlayerMute => (Glyph::Microphone, Mark::Muted),
@@ -1696,6 +1698,11 @@ fn paint_face(g: &dyn Host, b: &mut HudBatch, skin: &str, x: f32, y: f32, size: 
 }
 // Draw once after every screen, so pause/options cannot cover the microphone.
 pub(super) fn activation_hud(g: &dyn Host, state: &State, b: &mut HudBatch) {
+    // No voice handshake has arrived. Ordinary servers must not display a
+    // permanent connection animation, including when PTT or mute is held.
+    if state.status == Status::Waiting {
+        return;
+    }
     let (w, h) = g.gui_size();
     let s = &state.settings;
     let v = &state.snapshot;
@@ -1721,8 +1728,12 @@ pub(super) fn activation_hud(g: &dyn Host, state: &State, b: &mut HudBatch) {
         }
         let icon = if !s.enabled || s.deafened {
             VoiceIcon::Disabled
-        } else if state.status != Status::Connected {
+        } else if state.status == Status::Connecting {
             VoiceIcon::Connection
+        } else if matches!(state.status, Status::TimedOut | Status::Error) {
+            VoiceIcon::NoMod
+        } else if state.status == Status::ListenOnly {
+            VoiceIcon::InputUnavailable
         } else if v.permissions.get("pv.activation.proximity") == Some(&false) {
             VoiceIcon::ServerMute
         } else if s.muted {

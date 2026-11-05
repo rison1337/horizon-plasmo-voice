@@ -637,7 +637,7 @@ pub(super) fn tr(key: &str) -> String {
 pub(super) fn mods(mods: &mut Vec<horizon_client::mod_api::NativeMod>) {
     mods.push(horizon_client::mod_api::NativeMod {
         id: ID.into(),
-        title: "Plasmo Voice 0.5.1".into(),
+        title: "Plasmo Voice 0.5.2".into(),
         description: tr("description"),
         keys: vec![
             ["menu".into(), tr("open_menu"), "key.keyboard.v".into()],
@@ -1230,6 +1230,7 @@ mod tests {
         reject_packets: bool,
         sent: Vec<Vec<u8>>,
         saved: RefCell<Vec<String>>,
+        fills: RefCell<Vec<([f32; 4], u32)>>,
     }
     impl Host for TestHost {
         fn on(&self, _: &str) -> bool {
@@ -1245,7 +1246,11 @@ mod tests {
             let mut state = NativeClientState::default();
             state.window_id = self.id;
             state.eye_position = Some([0., 1.62, 0.]);
+            state.gui_size = [640., 360.];
             Some(state)
+        }
+        fn fill(&self, _: &mut horizon_client::hud::HudBatch, rect: [f32; 4], color: u32) {
+            self.fills.borrow_mut().push((rect, color));
         }
         fn client_entities(&self) -> Vec<NativeClientEntity> {
             self.entities.clone()
@@ -1284,6 +1289,46 @@ mod tests {
         fn mod_key(&self, _: &str, _: &str, default: &str) -> String {
             default.into()
         }
+    }
+
+    #[test]
+    fn activation_hud_hides_on_ordinary_servers_and_stops_animating_after_failure() {
+        let host = TestHost::default();
+        let mut state = State::new(&host);
+        let mut batch = horizon_client::hud::HudBatch::new([1280, 720]);
+        state.held = true;
+        state.settings.muted = true;
+        crate::menu::activation_hud(&host, &state, &mut batch);
+        assert!(host.fills.borrow().is_empty());
+
+        state.settings.muted = false;
+        state.held = false;
+        let draw = |state: &State| {
+            host.fills.borrow_mut().clear();
+            let mut batch = horizon_client::hud::HudBatch::new([1280, 720]);
+            crate::menu::activation_hud(&host, state, &mut batch);
+            host.fills.borrow().clone()
+        };
+        state.status = Status::Connecting;
+        let connecting = draw(&state);
+        assert!(!connecting.is_empty());
+        state.status = Status::TimedOut;
+        let failed = draw(&state);
+        assert!(!failed.is_empty());
+        assert_ne!(failed, connecting);
+        state.status = Status::Error;
+        assert_eq!(draw(&state), failed);
+        state.status = Status::ListenOnly;
+        let microphone_unavailable = draw(&state);
+        assert!(!microphone_unavailable.is_empty());
+        assert_ne!(microphone_unavailable, connecting);
+        assert_ne!(microphone_unavailable, failed);
+        state.status = Status::Connected;
+        assert!(draw(&state).is_empty());
+        state.held = true;
+        assert!(!draw(&state).is_empty());
+        state.status = Status::Waiting;
+        assert!(draw(&state).is_empty());
     }
 
     #[test]

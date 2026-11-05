@@ -1,11 +1,13 @@
 # Publishing checklist and prepared catalog entry
 
-This repository is private development work. It is not listed in the Horizon
-catalog and has no public release. The files under `publishing/horizon-mods/`
-are prepared submission material, not a submitted or approved listing.
+The owner authorized public source and a catalog submission after Horizon
+PR #9812 merged. Version 0.5.0 uses the official native API minimum **411**.
+The files under `publishing/horizon-mods/` are the submission material. Catalog
+acceptance is a separate maintainer decision; a GitHub Release alone does not
+make the mod appear in Horizon Launcher.
 
-1. Finish the official hooks registration and package using its actual API
-   minimum. Run the adapter checks, engine tests and `cargo horizon-mod check`.
+1. Package the registered API using its actual minimum. Run the adapter checks,
+   engine tests and `cargo horizon-mod check`.
 2. Review the source, README, license, runtime notices and release notes. Make
    the repository public only when its owner chooses to publish it.
 3. Publish a normal GitHub Release with the immutable `.hnmod` asset. Keep the
@@ -16,13 +18,20 @@ are prepared submission material, not a submitted or approved listing.
 5. Registry review and acceptance make the project appear on the site and in
    the launcher's Horizon catalog. Creating this repository alone does not.
 
-A private repository cannot serve as the source of a public catalog listing.
-Native mods also have Horizon's trust/build prompts. Registration of the
-voice mod and registration of the Horizon hooks are separate steps.
+A public catalog listing needs public source. Native mods also have Horizon's
+trust/build prompts. Registration of the voice mod and registration of the
+Horizon hooks are separate steps.
 
 The entry's icon is a square PNG under 256 KiB. Its name, summary, authors and
-license are mirrored in `horizon-registry.toml`. The template deliberately has
-no fabricated API level, release URL, file hash, signature or download count.
+license are mirrored in `horizon-registry.toml`. Published version entries use
+the actual artifact hash and date. No signature or download count is invented.
+
+The catalog currently publishes explicit `[[versions]]` entries. A `repo` field
+alone does not populate its existing index workflow. A manual submission also
+needs a reviewer to copy the public release asset to the catalog's `staging`
+release as `<sha256>.hnmod`, as its PR template specifies. The submission must
+provide the source release, exact SHA-256 and local registry-check results;
+catalog access is not implied by owning the mod's separate source repository.
 
 ## GitHub artwork
 

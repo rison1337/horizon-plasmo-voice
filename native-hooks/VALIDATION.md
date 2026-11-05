@@ -2,9 +2,9 @@
 
 The adapter is original Rust; the Plasmo Voice implementation and graphics were
 not read. Reference behavior was observed by running released Fabric 1.21.11
-with Plasmo Voice 2.1.17 in a disposable LAN world. All Horizon game and launcher
-runs use separate Game/Launcher/XDG directories, disable self-update and use
-HORIZON_NO_AUDIO=1. The saved Microsoft session is reused privately.
+with Plasmo Voice 2.1.17 in a disposable LAN world. Those UI runs use separate
+Game/Launcher/XDG directories, disable self-update and use HORIZON_NO_AUDIO=1.
+The saved Microsoft session was reused privately for those earlier LAN checks.
 
 ## Accepted API adjustment
 
@@ -13,6 +13,15 @@ the maintainer, `enable_older_servers`; it does not write process environment.
 A player explicitly supplies HORIZON_OLDER_SERVERS=1 for older servers.
 Development uses public merge ffd9ffb99554fc64433ca8a9258cf7a8ec1d5c2f without
 core patches. No official hooks number has been invented or locally stamped.
+
+## Official API registration
+
+Horizon PR #9812 merged on 5 November 2026, registering the required extensions
+as APIs 410 and 411. The release uses `hooks: 411` and public source
+`d52ff7a6f783a164043549f5f04645d5324d0d8a`. The unchanged adapter compiles on
+that source and all four regressions pass. The earlier UI integration checks
+below retain their original source identity. A separate remote version matrix
+also runs the registered API game with synthetic audio, as recorded below.
 
 ## Automated checks
 
@@ -65,10 +74,30 @@ full builds and screenshots remain private on the SSD. The distributable source,
 runtime files and JSON/TOML in the development package match the launcher-built
 package byte for byte; later README/validation updates do not change its code.
 
+## Remote version checks on the registered API
+
+An optimized game built on d52ff7a6f783a164043549f5f04645d5324d0d8a was tested
+against isolated Paper servers with released Plasmo Voice 2.1.17. Two offline
+test clients used fresh Game/Launcher/XDG folders and explicitly routed virtual
+audio. Synthetic 997 Hz capture passed through the actual UDP/AES/Opus path in
+both directions, including PTT in the pause menu; a separate output recording
+checked the received frequency and nonzero RMS. No physical audio was used.
+
+Server-issued named/lore items, nested shulker contents, legacy map_color and
+chest shift-clicks were checked against server-authoritative inventories.
+An explicit goat-horn instrument component still fails on the tested
+1.21.10/1.21.11 core. Horizon PR #8659 is included, but the additional upstream
+fix is tracked separately in PR #10038. The voice mod does not patch these
+Minecraft decoders or enable older protocols. HORIZON_OLDER_SERVERS=1 is still
+required by Horizon for older servers; a launch without it was rejected.
+
+Full per-version results and limits:
+https://github.com/rison1337/horizon-plasmo-voice/blob/main/docs/SERVER_COMPATIBILITY.md
+
 ## Limits
 
 No graphical Windows execution or physical Windows microphone/output test is
 claimed. Cross-compilation checking alone does not establish device behavior.
 No claim of full pixel-for-pixel or DSP identity with the Fabric implementation
-is made. A portable release still needs the official stamped API minimum.
+is made. The portable release uses the official stamped API minimum 411.
 Prepared resources, sessions and integration builds stay out of the public tree.

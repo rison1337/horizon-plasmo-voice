@@ -20,17 +20,15 @@ This works on Linux and Windows; then start it with Play as usual. It is not
 needed for servers using Horizon's pinned Minecraft version. The mod neither
 changes this setting nor mutates its process environment.
 
-The bundle pins public Horizon commit
-`ffd9ffb99554fc64433ca8a9258cf7a8ec1d5c2f`, containing both accepted PRs and the
-maintainer's adjustment. The launcher's normal native build downloads this
-public source; no prepared private source cache is required. Until the new API
-fragments are stamped, no `hooks` number is claimed. The package uses the public
-Hooks/Host API but is still pinned to this tested commit. After stamping, a
-release with the actual API minimum can build with future compatible Nightlies.
+Horizon [PR #9812](https://github.com/horizon-rust/horizon/pull/9812) registers
+the foreground GUI extension as API 410 and the client Host services as API 411.
+The release declares **`hooks: 411`** and records tested public commit
+`d52ff7a6f783a164043549f5f04645d5324d0d8a`. The launcher's ordinary native build
+can use compatible newer Nightlies; no private source cache is required.
 
 ## Installation
 
-After the official API minimum is stamped, put `dist/plasmo-voice-0.5.0.hnmod`
+Put `plasmo-voice-0.5.0.hnmod` from the GitHub Release
 in the selected instance's
 `horizon-native-mods/`. Enable `plasmo_voice` on the Mods page, select
 **Performance**, Build, then Play. For a 1.21.11 server, also set the environment
@@ -62,24 +60,24 @@ Stage the unchanged public core and the adapter for local checks:
 python3 tools/prepare_native_api.py --horizon /path/to/horizon
 ```
 
-Build a development check against the public accepted commit (no core patch):
+Build the release against the public registered API (no core patch):
 
 ```sh
-python3 tools/package_native_api.py --source .local/native-api-accepted --pinned
+python3 tools/package_native_api.py --source /path/to/registered/horizon
 ```
 
-This creates `dist/plasmo-voice-0.5.0-pinned-check.hnmod`, not the portable
-release. After the official release process stamps the accepted API fragments:
+This creates `dist/plasmo-voice-0.5.0.hnmod`. To reproduce its core revision:
 
 ```sh
-python3 tools/package_native_api.py --source /path/to/stamped/horizon \
-  --hooks OFFICIAL_MINIMUM_API_NUMBER
+python3 tools/prepare_native_api.py --horizon /path/to/horizon \
+  --revision d52ff7a6f783a164043549f5f04645d5324d0d8a --out .local/native-api-release
+python3 tools/package_native_api.py --source .local/native-api-release
 ```
 
-The tool rejects release mode until every required hook and helper is in the
-stamped catalog and the API level matches the tested source. Never guess a
-number or stamp a private number into a distributed package. Adding this mod
-to the public catalog remains a separate publication step.
+The tool requires every hook and helper to be in the committed official catalog
+and its API level to match the tested source. The separate `--pinned` mode is
+for development checks on older source. Adding the mod to the public catalog
+remains a separate reviewed step.
 
 The older `0.5.0-preview.1-native-api` package used unpublished integration
 source and is superseded. Previous local source-injection experiments are not part of this API-only

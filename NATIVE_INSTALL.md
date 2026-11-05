@@ -2,15 +2,15 @@
 
 ## Current status
 
-Version 0.5.0 is a development preview. Its public Hooks/Host integration is
-implemented and both required Horizon PRs are merged. A portable release needs
-the official API minimum, which has not yet been registered. The available
-source-built check package is named `plasmo-voice-0.5.0-pinned-check.hnmod`.
-It uses public Horizon source `ffd9ffb99554fc64433ca8a9258cf7a8ec1d5c2f`.
+Download `plasmo-voice-0.5.0.hnmod` from
+[Releases](https://github.com/rison1337/horizon-plasmo-voice/releases/tag/v0.5.0).
+Use a Horizon Nightly with native API **411 or newer**. Both required extensions
+are officially registered by [Horizon PR #9812](https://github.com/horizon-rust/horizon/pull/9812).
+The release records the tested public Horizon commit
+`d52ff7a6f783a164043549f5f04645d5324d0d8a` and declares `hooks: 411`, so it can
+also build on compatible later Nightlies.
 
-See [Development](docs/DEVELOPMENT.md) to produce it yourself. No public release
-asset is available yet. Do not treat the source check as a guarantee for every
-future Nightly.
+See [Development](docs/DEVELOPMENT.md) to build the package yourself.
 
 ## Add the mod to an instance
 
@@ -31,7 +31,7 @@ installs the current system's files and checks their hashes and codec/DSP APIs.
 The mod handles the Plasmo Voice protocol. Minecraft protocol translation is
 Horizon functionality and remains outside this mod.
 
-For a Minecraft **1.21.11** server, explicitly add this to the instance's launch
+For older servers supported by Horizon, explicitly add this to the instance's launch
 **Environment variables** field, on either Linux or Windows:
 
 ```text
@@ -42,6 +42,12 @@ Save the instance's launch settings and use Play normally. This opt-in is not
 needed for servers using Horizon's pinned Minecraft version. The mod does not
 set it automatically. Horizon requires your own prepared Minecraft **26.3**
 resources even when you join an older server.
+
+The accepted inventory fix is already in Horizon; no item-decoder patch belongs
+in this voice mod. Older protocols remain experimental. In particular, the
+tested core still cannot receive an explicitly configured goat-horn `instrument`
+component from 1.21.10/1.21.11 servers. See the
+[version matrix](docs/SERVER_COMPATIBILITY.md) for the tested cases and upstream fix.
 
 ## Build requirements
 

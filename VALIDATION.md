@@ -17,6 +17,15 @@ checks, not a claim that every platform or audio device has been tested.
 - The release packager rejects unregistered hooks and uncommitted local API
   stamping. A separate `--pinned` mode is available for development checks.
 
+## Release API registration
+
+[Horizon PR #9812](https://github.com/horizon-rust/horizon/pull/9812) is merged.
+Version 0.5.0 declares the official minimum `hooks: 411`, tested against public
+source `d52ff7a6f783a164043549f5f04645d5324d0d8a`. All four unchanged adapter
+regressions pass on that exact source. The remote version matrix below runs
+the optimized game on that registration merge. Earlier UI and Windows checks
+retain their original scope. The runtime code and payloads are unchanged.
+
 ## Automated checks
 
 | Check | Result |
@@ -62,20 +71,43 @@ self-update, and reused an existing Microsoft session privately.
 - **Lifecycle:** disconnect/reconnect completes a new handshake and keeps saved
   player levels.
 
-All new API-port game checks used `HORIZON_NO_AUDIO=1`. They prove input/UI and
+The earlier API-port UI checks used `HORIZON_NO_AUDIO=1`. They prove input/UI and
 network behavior, not physical microphone or speaker operation. Earlier engine
 interoperability checks used artificial signals through isolated virtual audio:
 real UDP/AES/Opus in both directions, measured gain multiplication, RNNoise and
 HRTF checks, and independent protocol fixtures.
 
+## Remote server version matrix
+
+The registered API build was also run against isolated Paper servers with
+released Plasmo Voice **2.1.17**, one server at a time. Two independently running
+Horizon clients joined over the public TCP/UDP endpoint with offline test-only
+identities. Each client had a fresh Game/Launcher/XDG directory.
+
+Audio was explicitly routed to named virtual ALSA/Pulse devices. Synthetic
+**997 Hz** input traversed the actual capture, UDP/AES/Opus and output path in
+both directions; an independent recording of the receiver's output checked its
+frequency and nonzero RMS. The reverse direction held physical PTT while the
+sender's pause menu remained open. Physical microphones and speakers were not used.
+
+The inventory checks used server-issued named/lore items, nested shulker
+contents, an obsolete `map_color` component where supported, and shift-clicks
+in both directions between a real chest and the player. Client counts were
+checked against server-authoritative entity and block data. A separate explicit
+goat-horn `instrument` probe records the remaining upstream issue rather than
+treating baseline item checks as complete protocol coverage.
+
+See [Server compatibility](docs/SERVER_COMPATIBILITY.md) for the complete
+version matrix, pinned Paper builds, measured results and known limitation.
+
 ## Limits and reproducibility
 
 Actual Windows GUI/device execution, physical microphone quality, human speech,
-and internet latency have not been established. Do not infer them from
+and controlled internet-latency measurements have not been established. Do not infer them from
 cross-checking alone. Pixel-for-pixel UI or bit-identical DSP is not claimed.
 
 Unit tests and adapter staging commands are in [Development](docs/DEVELOPMENT.md).
 Local integration reports remain under `.local/native-api-validation/accepted/`;
 prepared Minecraft resources, accounts, sessions, raw logs and caches are
 intentionally excluded from Git. The disposable game/reference/display
-processes used for validation were stopped.
+processes used for the earlier UI validation were stopped.

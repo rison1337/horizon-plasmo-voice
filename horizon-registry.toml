@@ -15,5 +15,5 @@ The launcher compiles the mod into the game. It communicates with the connected 
 
 This is not an official Plasmo Voice or Horizon release. Original Plasmo Voice implementation sources and graphics were not read or copied. Upstream project: https://github.com/plasmoapp/plasmo-voice.
 
-Tested against released Plasmo Voice 2.1.17 on Fabric 1.21.11. Linux live checks and Windows x64 cross-checking pass; actual Windows GUI and physical audio-device testing are outstanding. See the repository validation record for scope.
+Tested with Plasmo Voice 2.1.17: two-way synthetic audio and inventory/chest cases on Paper 1.21.10, 1.21.11, 26.1.2, 26.2 and 26.3, plus earlier Fabric 1.21.11 UI checks. Older protocols require Horizon's explicit opt-in; an explicit goat-horn instrument still fails in the tested 1.21.x core adapters (upstream PR #10038). Linux live checks and Windows x64 cross-checking pass; actual Windows GUI and physical audio-device testing are outstanding. See the repository validation record for scope.
 """

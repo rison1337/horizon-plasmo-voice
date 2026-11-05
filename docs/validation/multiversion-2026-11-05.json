@@ -1,0 +1,190 @@
+{
+  "core": "d52ff7a6f783a164043549f5f04645d5324d0d8a",
+  "plugin": "Plasmo Voice 2.1.17",
+  "audio": "synthetic 997 Hz over explicitly routed virtual ALSA/Pulse devices",
+  "default_old_version_rejected": true,
+  "versions": {
+    "1.21.10": {
+      "game_join": true,
+      "voice_handshake": true,
+      "voice_a_to_b": {
+        "sender": "PVNativeA",
+        "receiver": "PVNativeB",
+        "transmitted": true,
+        "received_speech": true,
+        "peak_hz": 996.7830882352943,
+        "rms": 0.0965738520026207
+      },
+      "voice_b_to_a_pause_menu": {
+        "sender": "PVNativeB",
+        "receiver": "PVNativeA",
+        "transmitted": true,
+        "received_speech": true,
+        "peak_hz": 996.7105263157895,
+        "rms": 0.07265383750200272
+      },
+      "inventory": {
+        "named_and_lore": true,
+        "map_color_received_and_dropped": true,
+        "nested_shulker": true,
+        "chest_shift_click_both_directions": true,
+        "server_authority_checked": true,
+        "baseline_decode_errors": 0,
+        "instrument_probe": {
+          "received": false,
+          "decode_errors": 3,
+          "translation_failed": true,
+          "note": "Pre-translation failures can be absent from status.server.decode_errors; item absent in client and translator errors recorded in private console log."
+        }
+      },
+      "complete": true,
+      "paper_build": 130,
+      "older_servers_opt_in": true
+    },
+    "1.21.11": {
+      "game_join": true,
+      "voice_handshake": true,
+      "voice_a_to_b": {
+        "sender": "PVNativeA",
+        "receiver": "PVNativeB",
+        "transmitted": true,
+        "received_speech": true,
+        "peak_hz": 996.7105263157895,
+        "rms": 0.06222114339470863
+      },
+      "voice_b_to_a_pause_menu": {
+        "sender": "PVNativeB",
+        "receiver": "PVNativeA",
+        "transmitted": true,
+        "received_speech": true,
+        "peak_hz": 996.7105263157895,
+        "rms": 0.06273231655359268
+      },
+      "inventory": {
+        "named_and_lore": true,
+        "map_color_received_and_dropped": true,
+        "nested_shulker": true,
+        "chest_shift_click_both_directions": true,
+        "server_authority_checked": true,
+        "baseline_decode_errors": 0,
+        "instrument_probe": {
+          "received": false,
+          "decode_errors": 0,
+          "translation_failed": true,
+          "note": "Pre-translation failures can be absent from status.server.decode_errors; item absent in client and translator errors recorded in private console log."
+        }
+      },
+      "complete": true,
+      "paper_build": 132,
+      "older_servers_opt_in": true
+    },
+    "26.1.2": {
+      "game_join": true,
+      "voice_handshake": true,
+      "voice_a_to_b": {
+        "sender": "PVNativeA",
+        "receiver": "PVNativeB",
+        "transmitted": true,
+        "received_speech": true,
+        "peak_hz": 996.7830882352943,
+        "rms": 0.06323572248220444
+      },
+      "voice_b_to_a_pause_menu": {
+        "sender": "PVNativeB",
+        "receiver": "PVNativeA",
+        "transmitted": true,
+        "received_speech": true,
+        "peak_hz": 996.7105263157895,
+        "rms": 0.06255315244197845
+      },
+      "inventory": {
+        "named_and_lore": true,
+        "map_color_received_and_dropped": true,
+        "nested_shulker": true,
+        "chest_shift_click_both_directions": true,
+        "server_authority_checked": true,
+        "baseline_decode_errors": 0,
+        "instrument_probe": {
+          "received": true,
+          "decode_errors": 0
+        }
+      },
+      "complete": true,
+      "paper_build": 74,
+      "older_servers_opt_in": true
+    },
+    "26.2": {
+      "game_join": true,
+      "voice_handshake": true,
+      "voice_a_to_b": {
+        "sender": "PVNativeA",
+        "receiver": "PVNativeB",
+        "transmitted": true,
+        "received_speech": true,
+        "peak_hz": 996.7105263157895,
+        "rms": 0.0612427294254303
+      },
+      "voice_b_to_a_pause_menu": {
+        "sender": "PVNativeB",
+        "receiver": "PVNativeA",
+        "transmitted": true,
+        "received_speech": true,
+        "peak_hz": 996.7105263157895,
+        "rms": 0.06211559846997261
+      },
+      "inventory": {
+        "named_and_lore": true,
+        "map_color_received_and_dropped": true,
+        "nested_shulker": true,
+        "chest_shift_click_both_directions": true,
+        "server_authority_checked": true,
+        "baseline_decode_errors": 0,
+        "instrument_probe": {
+          "received": true,
+          "decode_errors": 0
+        }
+      },
+      "complete": true,
+      "paper_build": 135,
+      "older_servers_opt_in": true
+    },
+    "26.3": {
+      "game_join": true,
+      "voice_handshake": true,
+      "voice_a_to_b": {
+        "sender": "PVNativeA",
+        "receiver": "PVNativeB",
+        "transmitted": true,
+        "received_speech": true,
+        "peak_hz": 996.7105263157895,
+        "rms": 0.06311627477407455
+      },
+      "voice_b_to_a_pause_menu": {
+        "sender": "PVNativeB",
+        "receiver": "PVNativeA",
+        "transmitted": true,
+        "received_speech": true,
+        "peak_hz": 996.7105263157895,
+        "rms": 0.06257972866296768
+      },
+      "inventory": {
+        "named_and_lore": true,
+        "map_color_received_and_dropped": false,
+        "nested_shulker": true,
+        "chest_shift_click_both_directions": true,
+        "server_authority_checked": true,
+        "baseline_decode_errors": 0,
+        "instrument_probe": {
+          "received": true,
+          "decode_errors": 0
+        }
+      },
+      "complete": true,
+      "paper_build": 242,
+      "older_servers_opt_in": false
+    }
+  },
+  "date": "2026-11-05",
+  "platform": "Linux x86_64",
+  "native_api": 411
+}

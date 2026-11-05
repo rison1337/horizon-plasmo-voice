@@ -67,7 +67,7 @@ bin = "plasmo-voice-runtime"
     shutil.copyfile(ROOT / "LICENSE", destination / "LICENSE")
     shutil.copyfile(ROOT / "THIRD_PARTY_NOTICES.md", destination / "NOTICE.md")
     shutil.copyfile(ROOT / "native-hooks/README.md", destination / "README.md")
-    shutil.copyfile(ROOT / "native-hooks/VALIDATION.md", destination / "VALIDATION.md")
+    shutil.copyfile(ROOT / "native-hooks/VALIDATION.md", destination / "README-validation.md")
 
 
 def main():

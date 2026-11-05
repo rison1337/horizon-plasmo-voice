@@ -19,12 +19,11 @@ players from Horizon, with positional sound, push to talk, and a familiar voice
 settings menu. This is a native **`.hnmod`**, built into the client by Horizon
 Launcher. It is written in Rust, not a Fabric or NeoForge JAR.
 
-> **Development preview · 0.5.0**
-> The Hooks/Host migration is implemented and tested against accepted Horizon
-> changes. Their official API numbers are still pending. The current development
-> package uses the tested public source commit; a portable release will declare
-> the actual minimum `hooks` API once it is registered. No public release or
-> Horizon catalog listing has been submitted yet.
+> **0.5.0 · Horizon native API 411 or newer**
+> The Hooks/Host integration uses officially registered Horizon APIs. Download
+> the `.hnmod` from [Releases](https://github.com/rison1337/horizon-plasmo-voice/releases).
+> One package includes both Linux x86_64 and Windows x64 runtimes.
+> The Horizon catalog listing is submitted separately for review.
 
 ## What you get
 
@@ -61,15 +60,17 @@ Put the `.hnmod` into your instance's `horizon-native-mods/`, enable
 **Build**. Then start the instance with **Play**. The post-build step installs
 and verifies the libraries for the current operating system.
 
-For the current preview, build the package from source using the
-[development guide](docs/DEVELOPMENT.md). Full instructions and platform
-requirements are in [NATIVE_INSTALL.md](NATIVE_INSTALL.md).
+Use a Nightly with native API **411 or newer**. The release records the tested
+public source commit; compatible newer Nightlies can build it too.
+Source-build commands are in the [development guide](docs/DEVELOPMENT.md).
+Full instructions and platform requirements are in [NATIVE_INSTALL.md](NATIVE_INSTALL.md).
 
-**Minecraft version support belongs to Horizon.** For a Minecraft 1.21.11 server,
-explicitly set `HORIZON_OLDER_SERVERS=1` in your instance's launch
+**Minecraft version support belongs to Horizon.** For older servers supported
+by Horizon, explicitly set `HORIZON_OLDER_SERVERS=1` in your instance's launch
 **Environment variables**. The voice mod does not enable old protocols, replace
 item decoders, or change that environment variable. Horizon itself uses resources
-from Minecraft 26.3.
+from Minecraft 26.3. See the [server compatibility checks](docs/SERVER_COMPATIBILITY.md)
+for tested versions and the remaining upstream inventory limitation.
 
 ## In-game interface
 
@@ -84,9 +85,13 @@ The interoperability reference is released **Plasmo Voice 2.1.17 on Fabric
 not read or copied. This project is not affiliated with or endorsed by the
 Plasmo Voice, Horizon, Mojang, or Microsoft teams.
 
-Linux live checks cover the accepted API build, handshake/reconnect, PTT on
-eight screens, player volume, English UI, camera alignment, helmet/crouch
-clearance, and block-shape visibility. The engine has **22 engine tests** and the
+Linux live checks include real two-way synthetic audio against Paper
+**1.21.10, 1.21.11, 26.1.2, 26.2 and 26.3**, plus pause-menu PTT and chest/item
+checks. An explicit horn instrument still fails in Horizon's two tested 1.21.x
+adapters; see the [matrix and upstream fix](docs/SERVER_COMPATIBILITY.md).
+Earlier checks cover PTT on eight screens, player volume, English UI, camera
+alignment, helmet/crouch clearance, and block-shape visibility.
+The engine has **22 engine tests** and the
 adapter has **4 regression tests**. Windows x64 cross-checking passes; actual
 Windows GUI and physical audio-device testing is still outstanding.
 

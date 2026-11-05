@@ -42,24 +42,28 @@ use a new `--out .local/<name>` to select a different core revision.
 
 ## Package
 
-While the required API entries are unnumbered, use the explicitly named
-source-check mode:
-
-```sh
-python3 tools/package_native_api.py --source .local/native-api-accepted --pinned
-```
-
-The output is `dist/plasmo-voice-0.5.0-pinned-check.hnmod`. After the official
-catalog contains all required entries, use a clean source checkout with that
-accepted stamp and omit `--pinned`:
+The official API minimum is **411**, registered by Horizon PR #9812. Build a
+release from its clean public source, or a compatible later source whose actual
+API level you have tested:
 
 ```sh
 python3 tools/package_native_api.py --source /path/to/registered/horizon
 ```
 
+The output is `dist/plasmo-voice-0.5.0.hnmod`. To reproduce the release's core
+revision, stage it explicitly:
+
+```sh
+python3 tools/prepare_native_api.py --horizon ../horizon \
+  --revision d52ff7a6f783a164043549f5f04645d5324d0d8a --out .local/native-api-release
+python3 tools/package_native_api.py --source .local/native-api-release
+```
+
 The tool reads the actual committed API level and creates the portable package;
 it refuses to guess a number. Package output and SHA-256 are printed as JSON.
 The registry's final file check is `cargo horizon-mod check <file.hnmod>`.
+The explicit `--pinned` option remains available for development-only checks on
+older source whose required APIs are still pending; it is not a release mode.
 
 For playing, let the official launcher build in **Performance** mode. Keep live
 tests isolated from real game data; prepare resources from your own Minecraft

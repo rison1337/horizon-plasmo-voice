@@ -32,6 +32,10 @@ no fabricated API level, release URL, file hash, signature or download count.
 
 GitHub social-preview artwork is uploaded through repository Settings → General
 → Social preview. The README already references the shared logo and banner.
+GitHub permits a first social-preview upload on a public repository; a new private
+repository cannot be assigned its first custom preview yet. Keep the supplied
+image for publication instead of changing this repository's visibility.
+Reference: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/customizing-your-repositorys-social-media-preview
 
 ## Release notes draft
 

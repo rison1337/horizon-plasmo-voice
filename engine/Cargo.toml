@@ -1,0 +1,19 @@
+[package]
+name = "horizon-plasmo-engine"
+version = "0.1.0"
+edition = "2024"
+license = "MIT"
+repository = "https://github.com/rison1337/horizon-plasmo-voice"
+description = "Plasmo Voice proximity client for a Horizon native mod"
+
+[dependencies]
+aes = "0.8.4"
+cbc = "0.1.2"
+getrandom = "0.3"
+libloading = "0.8.9"
+log = "0.4"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+cpal = "0.16"
+
+sha2 = "0.10.9"

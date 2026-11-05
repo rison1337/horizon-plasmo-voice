@@ -1,0 +1,25 @@
+# Prepared submission: this is not yet listed in the Horizon catalog.
+id = "plasmo_voice"
+kind = "native-mod"
+repo = "rison1337/horizon-plasmo-voice"
+owners = ["rison1337"]
+icon = "icons/plasmo_voice.png"
+name = "Plasmo Voice for Horizon"
+summary = "Proximity voice for Plasmo Voice 2.1 servers, built natively for Horizon. Spatial audio, push to talk, and player controls."
+authors = ["rison1337"]
+license = "MIT"
+description = """
+An unofficial, independently written Rust client compatible with Plasmo Voice 2.1 servers.
+
+- Proximity voice with distance attenuation, stereo positioning, optional HRTF and noise suppression.
+- Push to talk over normal menus, a foreground microphone indicator, and configurable key bindings.
+- Six settings tabs, device selection, microphone preview, and per-player/source volume and mute.
+- Pixel head icons with current-frame positioning, helmet clearance and block-shape visibility.
+- One native .hnmod with Linux x86_64 and Windows x64 runtimes; English and Russian UI.
+
+The launcher compiles the mod into the game. It communicates with the connected server's advertised voice endpoint, uses the selected audio devices, and keeps per-instance settings. It does not implement or enable Minecraft older-version adapters.
+
+This is not an official Plasmo Voice or Horizon release. Original Plasmo Voice implementation sources and graphics were not read or copied. Upstream project: https://github.com/plasmoapp/plasmo-voice.
+
+Tested against released Plasmo Voice 2.1.17 on Fabric 1.21.11. Linux live checks and Windows x64 cross-checking pass; actual Windows GUI and physical audio-device testing are outstanding. See the repository validation record for scope.
+"""

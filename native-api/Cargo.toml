@@ -1,0 +1,15 @@
+[package]
+name = "horizon-plasmo-native"
+version = "0.5.0"
+edition = "2024"
+license = "MIT"
+repository = "https://github.com/rison1337/horizon-plasmo-voice"
+description = "Plasmo Voice using the Horizon Hooks/Host client API"
+
+[dependencies]
+horizon-client = { path = "../../horizon/crates/horizon-client" }
+horizon-protocol = { path = "../../horizon/crates/horizon-protocol" }
+horizon-plasmo-engine = { path = "../engine" }
+serde_json = "1"
+log = "0.4"
+glam = "0.30"

@@ -1,0 +1,28 @@
+# Local data, build outputs and credentials never belong in the repository.
+/.local/
+/target/
+/dist/
+**/target/
+**/__pycache__/
+*.pyc
+*.hnmod
+*.log
+.env
+.env.*
+*.key
+*.pem
+accounts.json
+session*.json
+
+# Previous 0.4.x source-injection experiments remain local, outside this API port.
+/*.rs
+/horizon-mixin.toml
+/distribution/
+/native-hooks/*.patch
+
+# Publish the current toolchain, not machine-specific launcher/test scripts.
+/tools/*
+!/tools/prepare_native_api.py
+!/tools/package_native_api.py
+!/tools/export_branding.py
+!/tools/check_native_api_ptt.py

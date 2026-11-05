@@ -6,6 +6,13 @@ The files under `publishing/horizon-mods/` are the submission material. Catalog
 acceptance is a separate maintainer decision; a GitHub Release alone does not
 make the mod appear in Horizon Launcher.
 
+The source is public and the normal
+[v0.5.0 release](https://github.com/rison1337/horizon-plasmo-voice/releases/tag/v0.5.0)
+is published. [Catalog PR #305](https://github.com/horizon-rust/horizon-mods/pull/305)
+contains the entry, icon and local check results. It requests the reviewer's
+required staging upload; neither the release nor this submission claims catalog
+acceptance.
+
 1. Package the registered API using its actual minimum. Run the adapter checks,
    engine tests and `cargo horizon-mod check`.
 2. Review the source, README, license, runtime notices and release notes. Make

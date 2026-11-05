@@ -23,7 +23,8 @@ Launcher. It is written in Rust, not a Fabric or NeoForge JAR.
 > The Hooks/Host integration uses officially registered Horizon APIs. Download
 > the `.hnmod` from [Releases](https://github.com/rison1337/horizon-plasmo-voice/releases).
 > One package includes both Linux x86_64 and Windows x64 runtimes.
-> The Horizon catalog listing is submitted separately for review.
+> The [Horizon catalog submission](https://github.com/horizon-rust/horizon-mods/pull/305)
+> is pending review; publishing a release does not list it automatically.
 
 ## What you get
 
@@ -107,7 +108,7 @@ limits. Pixel-for-pixel UI or bit-identical audio processing is not claimed.
 | `data/runtime/` | Both platforms' libraries, checksums, licenses and source archives |
 | `tools/` | Development staging, packaging, and branding exports |
 | `assets/` | Shared launcher/README icon and GitHub social preview artwork |
-| `publishing/` | Prepared catalog entry and icon; not submitted |
+| `publishing/` | Catalog entry and icon submitted for review |
 
 ## License and credits
 

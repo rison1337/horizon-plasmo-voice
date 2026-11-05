@@ -47,6 +47,15 @@ the libraries. The mod is MIT; no OpenAL implementation was read or copied into
 its implementation. Libraries can be replaced in native-data/plasmo_voice/lib/.
 UI icons are code-drawn native primitives; original mod graphic assets are not bundled.
 
+The 0.5.1 Linux Opus/RNNoise binaries are unmodified upstream releases rebuilt
+with baseline x86_64 flags and runtime CPU detection. Build/license references:
+- Opus 1.6.1 (BSD), COPYING in the release archive:
+  https://downloads.xiph.org/releases/opus/opus-1.6.1.tar.gz
+- RNNoise 0.2 (BSD), COPYING in the release archive:
+  https://github.com/xiph/rnnoise/releases/tag/v0.2
+Only their license/build configuration and published APIs were consulted;
+no foreign codec/DSP implementation was copied into the Rust engine.
+
 
 Historical attribution (local 0.4.x only; not included in the 0.5.0 API adapter):
 Item component compatibility was adapted from Horizon PR #8659,

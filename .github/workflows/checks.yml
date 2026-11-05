@@ -14,7 +14,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       - name: Install Linux build dependencies
-        run: sudo apt-get update && sudo apt-get install -y libasound2-dev libudev-dev pkg-config
+        run: sudo apt-get update && sudo apt-get install -y libasound2-dev libudev-dev pkg-config qemu-user
       - uses: dtolnay/rust-toolchain@stable
         with:
           components: rustfmt, clippy
@@ -33,3 +33,7 @@ jobs:
         run: cargo run --locked -p horizon-plasmo-engine --bin plasmo-voice-runtime -- --check
       - name: Check development tool syntax
         run: python3 -m py_compile tools/prepare_native_api.py tools/package_native_api.py tools/export_branding.py
+      - name: Bundled runtime on a baseline CPU without AVX
+        env:
+          LD_LIBRARY_PATH: ${{ github.workspace }}/data/runtime/linux-x86_64
+        run: qemu-x86_64 -cpu qemu64 target/debug/plasmo-voice-runtime --check

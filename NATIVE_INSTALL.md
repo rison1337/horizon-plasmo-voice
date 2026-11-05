@@ -53,7 +53,7 @@ component from 1.21.10/1.21.11 servers. See the
 
 | Platform | Requirements and current verification |
 | --- | --- |
-| Linux x86_64 | C compiler, pkg-config, ALSA/libudev development headers; live game tested |
+| Linux x86_64 | GLIBC 2.29+, C compiler, pkg-config, ALSA/libudev development headers; live game tested |
 | Windows x64 | Launcher-provided Rust/MinGW toolchain; cross-check passed, real GUI/devices untested |
 
 Internet access is needed for the launcher's first source/toolchain build.

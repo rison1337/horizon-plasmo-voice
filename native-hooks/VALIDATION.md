@@ -10,6 +10,12 @@ and no indicator on button holds or unchanged volume limits. The indicator
 expires after 1.5 seconds even with the chord held. Audio was disabled; this
 input/HUD update does not repeat or extend the 0.5.0 voice-version matrix below.
 
+Linux Opus 1.6.1 and RNNoise 0.2 were also rebuilt for baseline x86_64 with
+runtime CPU detection after the old binaries failed CI with SIGILL. The old
+set reproduces SIGILL on QEMU qemu64; the new set passes Opus/RNNoise/HRTF
+loopback on the same no-AVX model. CI repeats this CPU compatibility check.
+The Rust engine, Windows runtimes and OpenAL binaries are unchanged.
+
 The adapter is original Rust; the Plasmo Voice implementation and graphics were
 not read. Reference behavior was observed by running released Fabric 1.21.11
 with Plasmo Voice 2.1.17 in a disposable LAN world. Those UI runs use separate

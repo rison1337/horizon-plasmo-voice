@@ -20,6 +20,26 @@ Players do not need it: the launcher's post-build step installs libraries where
 the game loads them by absolute path. CI also runs the codec/DSP self-check in
 loopback mode without physical audio devices.
 
+### Linux runtime portability
+
+The bundled Opus 1.6.1 and RNNoise 0.2 use unmodified upstream release sources
+and `CFLAGS="-O2 -march=x86-64 -mtune=generic"`. Build shared libraries without
+host-specific ISA flags; keep Opus runtime CPU detection enabled and configure
+RNNoise with `--enable-x86-rtcd`. Source checksums are in
+`data/runtime/README.txt`; retain the upstream BSD notices.
+
+Build/link against a GLIBC sysroot whose exported ABI is no newer than 2.29.
+When rebuilding on a newer development machine, verify `readelf -V` output:
+linking against its host libm can introduce newer versioned math symbols even
+with baseline CPU flags. Exclude packed-relative-relocation requirements.
+Update the runtime manifest's SHA-256 values after stripping the binaries.
+
+Run the engine tests and installer self-check against the rebuilt libraries.
+CI also runs `qemu-x86_64 -cpu qemu64 target/debug/plasmo-voice-runtime --check`
+with the bundled library path, exercising a CPU without AVX. This check caught
+SIGILL in the previous distribution-specific binaries. QEMU and the private
+userspace used locally are test tools, not part of the distributed mod.
+
 ## Hooks/Host adapter
 
 Clone Horizon next to this repository, then stage a disposable development

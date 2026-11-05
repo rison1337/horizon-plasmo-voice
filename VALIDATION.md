@@ -25,7 +25,15 @@ The fixture clients and display were stopped; the user's running game was not
 used for these checks. Private report: `.local/volume-051-report.json`.
 
 The detailed audio/version matrix below remains the completed **0.5.0** result;
-the engine, networking and codec/DSP runtime are unchanged by 0.5.1.
+the engine and networking Rust code are unchanged by 0.5.1. A CI SIGILL exposed
+an excessive CPU requirement in the previous Linux codec binaries. Opus 1.6.1
+and RNNoise 0.2 were rebuilt with `-O2 -march=x86-64 -mtune=generic`, runtime CPU
+detection, and a GLIBC symbol floor no newer than 2.29. Windows and OpenAL
+binaries are unchanged. The old libraries reproduce SIGILL on QEMU `qemu64`;
+the new libraries pass Opus encode/decode, RNNoise and HRTF loopback on that
+same CPU model with a private Ubuntu userspace. CI now repeats that no-AVX
+runtime check. This is a codec/DSP compatibility check, not another live voice
+version matrix or physical-device test.
 
 ## Source and package
 

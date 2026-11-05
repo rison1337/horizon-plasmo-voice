@@ -1,0 +1,13 @@
+{
+  "version": "0.5.1",
+  "opus": "1.6.1",
+  "rnnoise": "0.2",
+  "linux_cflags": "-O2 -march=x86-64 -mtune=generic",
+  "runtime_cpu_detection": true,
+  "glibc_minimum": "2.29",
+  "cpu_probe": "qemu64 without AVX",
+  "previous_runtime_returncode": -4,
+  "updated_runtime_returncode": 0,
+  "engine_tests_passed": 22,
+  "physical_audio_used": false
+}

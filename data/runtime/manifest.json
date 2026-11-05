@@ -5,12 +5,12 @@
       {
         "source": "linux-x86_64/libopus.so.0",
         "destination": "lib/libopus.so.0",
-        "sha256": "39fea064e2ea9fabbc067249dd0257b0b3d73f17bb49f1d5b7c6cdc318587f0a"
+        "sha256": "698e3bcc2a1db978a22e830929661a0f16d26476161a880a16a60bf23d89a8ef"
       },
       {
         "source": "linux-x86_64/librnnoise.so.0",
         "destination": "lib/librnnoise.so.0",
-        "sha256": "c08a1dba329a71385688a31f65cb9eba2bde6d1bcc6917b6c2f5442a91deb00f"
+        "sha256": "b551704450550d3dbf9b69e06041dab8caae0d27745f8ab03a6157a6cdf555c9"
       },
       {
         "source": "linux-x86_64/libopenal.so.1",
@@ -65,7 +65,7 @@
     {
       "source": "README.txt",
       "destination": "README.txt",
-      "sha256": "c35848cd44676ad57c9994ed01a718db5777ee3003769859ceb69bc874aedc85"
+      "sha256": "8869e1920bd0ba9008e104ea3a46b6d4db433b1351206d3c4851449dc4e7a909"
     }
   ]
 }

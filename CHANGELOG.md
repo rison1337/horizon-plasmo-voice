@@ -8,6 +8,8 @@
   Holding RMB no longer displays or refreshes it.
 - Keeps the hotbar still when adjustment reaches the 0% or 200% limit, without
   showing a new change indicator.
+- Rebuilds the Linux Opus/RNNoise runtime for baseline x86_64 with runtime CPU
+  detection, fixing SIGILL on processors missing the old binaries' instructions.
 
 ## 0.5.0 — 2026-11-05
 

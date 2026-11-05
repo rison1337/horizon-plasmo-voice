@@ -7,13 +7,18 @@ For example, on Debian/Ubuntu:
 
 ```sh
 sudo apt-get install build-essential pkg-config libasound2-dev libudev-dev
-cargo test --workspace --locked
+LD_LIBRARY_PATH="$PWD/data/runtime/linux-x86_64" cargo test --workspace --locked
 cargo fmt --all -- --check
 cargo clippy --workspace --all-targets --locked -- -D warnings
 ```
 
 These commands exercise the standalone Rust engine. They do not by themselves
 compile the Horizon adapter or launch a game.
+
+The test-only library path selects this repository's bundled Linux runtime.
+Players do not need it: the launcher's post-build step installs libraries where
+the game loads them by absolute path. CI also runs the codec/DSP self-check in
+loopback mode without physical audio devices.
 
 ## Hooks/Host adapter
 

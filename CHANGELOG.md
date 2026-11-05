@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.5.1 — 2026-11-05
+
+- Requires Shift + the action key (RMB by default) + scroll to adjust a targeted
+  player's volume; either Shift key works.
+- Shows the volume indicator only when a scroll actually changes the volume.
+  Holding RMB no longer displays or refreshes it.
+- Keeps the hotbar still when adjustment reaches the 0% or 200% limit, without
+  showing a new change indicator.
+
 ## 0.5.0 — 2026-11-05
 
 - Moves the native client to public Horizon Hooks/Host services.

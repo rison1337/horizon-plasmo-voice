@@ -1,5 +1,15 @@
 # API adapter validation, 5 November 2026
 
+## 0.5.1 input adjustment
+
+The registered API 411 build passes five adapter regressions and Clippy with
+warnings denied. A separate two-client Linux LAN fixture used physical X11
+input and screenshots to verify Shift + RMB + scroll, either Shift key,
+reverse scroll, normal hotbar behavior without the chord, wall/target checks,
+and no indicator on button holds or unchanged volume limits. The indicator
+expires after 1.5 seconds even with the chord held. Audio was disabled; this
+input/HUD update does not repeat or extend the 0.5.0 voice-version matrix below.
+
 The adapter is original Rust; the Plasmo Voice implementation and graphics were
 not read. Reference behavior was observed by running released Fabric 1.21.11
 with Plasmo Voice 2.1.17 in a disposable LAN world. Those UI runs use separate

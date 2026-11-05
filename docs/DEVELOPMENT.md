@@ -50,7 +50,7 @@ API level you have tested:
 python3 tools/package_native_api.py --source /path/to/registered/horizon
 ```
 
-The output is `dist/plasmo-voice-0.5.0.hnmod`. To reproduce the release's core
+The output is `dist/plasmo-voice-0.5.1.hnmod`. To reproduce the release's core
 revision, stage it explicitly:
 
 ```sh

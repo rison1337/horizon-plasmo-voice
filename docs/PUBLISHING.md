@@ -1,13 +1,13 @@
 # Publishing checklist and prepared catalog entry
 
 The owner authorized public source and a catalog submission after Horizon
-PR #9812 merged. Version 0.5.0 uses the official native API minimum **411**.
+PR #9812 merged. Version 0.5.1 uses the official native API minimum **411**.
 The files under `publishing/horizon-mods/` are the submission material. Catalog
 acceptance is a separate maintainer decision; a GitHub Release alone does not
 make the mod appear in Horizon Launcher.
 
 The source is public and the normal
-[v0.5.0 release](https://github.com/rison1337/horizon-plasmo-voice/releases/tag/v0.5.0)
+[v0.5.1 release](https://github.com/rison1337/horizon-plasmo-voice/releases/tag/v0.5.1)
 is published. [Catalog PR #305](https://github.com/horizon-rust/horizon-mods/pull/305)
 contains the entry, icon and local check results. It requests the reviewer's
 required staging upload; neither the release nor this submission claims catalog
@@ -53,7 +53,15 @@ repository cannot be assigned its first custom preview yet. Keep the supplied
 image for publication instead of changing this repository's visibility.
 Reference: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/customizing-your-repositorys-social-media-preview
 
-## Release notes draft
+## Release notes
+
+**0.5.1 — player-volume controls**
+
+- Requires Shift + the action key (RMB by default) + scroll; either Shift key works.
+- Displays volume only after an actual change, and expires after 1.5 seconds
+  even if the buttons remain held. Normal scrolling retains hotbar behavior.
+- Five adapter regressions, Clippy, and an isolated two-client physical-input/HUD
+  check pass. The unchanged engine retains the documented 0.5.0 voice matrix.
 
 **0.5.0 — native Hooks/Host client**
 

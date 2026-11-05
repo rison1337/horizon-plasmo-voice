@@ -3,6 +3,30 @@
 Recorded on **5 November 2026** for the 0.5.0 API adapter. These are completed
 checks, not a claim that every platform or audio device has been tested.
 
+## 0.5.1 player-volume controls
+
+The adapter now requires Shift + the configured action key (RMB by default) +
+scroll. It creates or refreshes the player-volume indicator only when the value
+actually changes, rather than every frame while RMB is held.
+
+On the same registered API 411 core, **five adapter regressions** pass and
+Clippy passes with warnings denied. The added regression covers ordinary,
+RMB-only and Shift-only scrolling, either Shift key, a real change, the volume
+limit and a blocking wall.
+
+Two fresh isolated Linux clients also exercised physical X11 button/key/wheel
+input in a LAN world with audio disabled. Screenshot checks found no volume
+bar on RMB or Shift+RMB alone, found it after changes, and verified expiration
+after 1.5 seconds while those buttons remained held. Both Shift keys and reverse
+scroll work. Adjustment preserves the hotbar, including at 200%; scrolling at
+the limit does not show a new indicator. Ordinary/RMB-only/Shift-only scrolling
+retains normal hotbar behavior. Looking away or a wall prevents adjustment.
+The fixture clients and display were stopped; the user's running game was not
+used for these checks. Private report: `.local/volume-051-report.json`.
+
+The detailed audio/version matrix below remains the completed **0.5.0** result;
+the engine, networking and codec/DSP runtime are unchanged by 0.5.1.
+
 ## Source and package
 
 - Both Horizon extensions are merged: [#9556](https://github.com/horizon-rust/horizon/pull/9556)

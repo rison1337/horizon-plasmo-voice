@@ -235,19 +235,6 @@ pub(super) fn payload(game: &mut dyn Host, bytes: &[u8]) {
 pub(super) fn frame(game: &mut dyn Host) {
     with_state(game, |game, state| {
         actions(game, state);
-        if game.playing()
-            && key_active(
-                &game.mod_key(ID, "action", "key.mouse.right"),
-                &state.pressed,
-            )
-            && let Some((uuid, name)) = volume_target(game)
-        {
-            state.volume_hint = Some(PlayerVolumeHint {
-                uuid,
-                name,
-                at: Instant::now(),
-            });
-        }
         flush_settings(game, state);
         let language = horizon_client::lang::code();
         if state.settings.language != language {
@@ -650,7 +637,7 @@ pub(super) fn tr(key: &str) -> String {
 pub(super) fn mods(mods: &mut Vec<horizon_client::mod_api::NativeMod>) {
     mods.push(horizon_client::mod_api::NativeMod {
         id: ID.into(),
-        title: "Plasmo Voice 0.5.0".into(),
+        title: "Plasmo Voice 0.5.1".into(),
         description: tr("description"),
         keys: vec![
             ["menu".into(), tr("open_menu"), "key.keyboard.v".into()],
@@ -1067,20 +1054,32 @@ pub(super) fn wheel(game: &mut dyn Host, steps: f32, claimed: &mut bool) {
     }
     let binding = game.mod_key(ID, "action", "key.mouse.right");
     with_state(game, |game, state| {
-        if !key_active(&binding, &state.pressed) {
+        if !key_active(&binding, &state.pressed)
+            || !(state.pressed.contains("key.keyboard.left.shift")
+                || state.pressed.contains("key.keyboard.right.shift"))
+        {
             return;
         }
         let Some((uuid, name)) = volume_target(game) else {
             return;
         };
-        let volume = state.settings.player_volumes.entry(uuid).or_insert(1.);
-        *volume = ((*volume + steps * 0.05).clamp(0., 2.) * 1000.).round() / 1000.;
+        *claimed = true;
+        let previous = state
+            .settings
+            .player_volumes
+            .get(&uuid)
+            .copied()
+            .unwrap_or(1.);
+        let volume = ((previous + steps * 0.05).clamp(0., 2.) * 1000.).round() / 1000.;
+        if volume == previous {
+            return;
+        }
+        state.settings.player_volumes.insert(uuid, volume);
         state.volume_hint = Some(PlayerVolumeHint {
             uuid,
             name,
             at: Instant::now(),
         });
-        *claimed = true;
         persist(game, state);
     });
 }
@@ -1225,6 +1224,7 @@ mod tests {
     #[derive(Default)]
     struct TestHost {
         id: u64,
+        playing: bool,
         entities: Vec<NativeClientEntity>,
         wall: Option<f64>,
         reject_packets: bool,
@@ -1232,6 +1232,12 @@ mod tests {
         saved: RefCell<Vec<String>>,
     }
     impl Host for TestHost {
+        fn on(&self, _: &str) -> bool {
+            true
+        }
+        fn playing(&self) -> bool {
+            self.playing
+        }
         fn window(&self) -> bool {
             true
         }
@@ -1324,6 +1330,86 @@ mod tests {
     }
 
     #[test]
+    fn player_volume_hint_requires_shift_action_scroll_and_an_actual_change() {
+        let mut player = NativeClientEntity::default();
+        player.bounds = [[-0.3, 0., 5.7], [0.3, 1.8, 6.3]];
+        player.player_uuid = Some(7);
+        player.player_name = Some("Player7".into());
+        let mut host = TestHost {
+            id: 90002,
+            playing: true,
+            entities: vec![player],
+            ..Default::default()
+        };
+        raw_mouse(&mut host, 1, true);
+        frame(&mut host);
+        assert!(states().lock().unwrap()[&host.id].volume_hint.is_none());
+
+        // Plain scrolling, RMB scrolling and Shift scrolling retain normal game behavior.
+        for keys in [
+            vec![],
+            vec!["key.mouse.right"],
+            vec!["key.keyboard.left.shift"],
+        ] {
+            states().lock().unwrap().get_mut(&host.id).unwrap().pressed =
+                keys.into_iter().map(str::to_owned).collect();
+            let mut claimed = false;
+            wheel(&mut host, 1., &mut claimed);
+            assert!(!claimed);
+            let all = states().lock().unwrap();
+            assert!(all[&host.id].settings.player_volumes.is_empty());
+            assert!(all[&host.id].volume_hint.is_none());
+        }
+
+        for shift in ["key.keyboard.left.shift", "key.keyboard.right.shift"] {
+            {
+                let mut all = states().lock().unwrap();
+                let state = all.get_mut(&host.id).unwrap();
+                state.pressed = ["key.mouse.right", shift]
+                    .into_iter()
+                    .map(str::to_owned)
+                    .collect();
+                state.volume_hint = None;
+            }
+            let mut claimed = false;
+            wheel(&mut host, 1., &mut claimed);
+            assert!(claimed);
+            {
+                let all = states().lock().unwrap();
+                assert_eq!(all[&host.id].settings.player_volumes[&7], 1.05);
+                let hint = all[&host.id].volume_hint.as_ref().unwrap();
+                assert_eq!((hint.uuid, hint.name.as_str()), (7, "Player7"));
+            }
+            wheel(&mut host, -1., &mut claimed);
+            assert_eq!(
+                states().lock().unwrap()[&host.id].settings.player_volumes[&7],
+                1.
+            );
+        }
+
+        {
+            let mut all = states().lock().unwrap();
+            let state = all.get_mut(&host.id).unwrap();
+            state.settings.player_volumes.insert(7, 2.);
+            state.volume_hint = None;
+        }
+        let mut claimed = false;
+        wheel(&mut host, 1., &mut claimed);
+        assert!(claimed); // Keep the hotbar still at the volume limit.
+        assert!(states().lock().unwrap()[&host.id].volume_hint.is_none());
+        host.wall = Some(4.);
+        claimed = false;
+        wheel(&mut host, -1., &mut claimed);
+        assert!(!claimed);
+        assert_eq!(
+            states().lock().unwrap()[&host.id].settings.player_volumes[&7],
+            2.
+        );
+        assert!(states().lock().unwrap()[&host.id].volume_hint.is_none());
+        disconnect(&host);
+    }
+
+    #[test]
     fn posed_helmet_has_fixed_world_clearance_and_tracks_crouching() {
         let mut head = NativeClientHead::default();
         head.origin = [10., 64., 20.];
@@ -1344,7 +1430,7 @@ mod tests {
 
     #[test]
     fn gui_ptt_receives_release_and_disconnect_saves_pending_changes_once() {
-        // No playing() implementation: these GUI callbacks must not depend on gameplay focus.
+        // playing() is false: these GUI callbacks must not depend on gameplay focus.
         let host = TestHost {
             id: 90001,
             ..Default::default()

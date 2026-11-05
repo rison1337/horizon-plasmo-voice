@@ -19,7 +19,7 @@ players from Horizon, with positional sound, push to talk, and a familiar voice
 settings menu. This is a native **`.hnmod`**, built into the client by Horizon
 Launcher. It is written in Rust, not a Fabric or NeoForge JAR.
 
-> **0.5.0 · Horizon native API 411 or newer**
+> **0.5.1 · Horizon native API 411 or newer**
 > The Hooks/Host integration uses officially registered Horizon APIs. Download
 > the `.hnmod` from [Releases](https://github.com/rison1337/horizon-plasmo-voice/releases).
 > One package includes both Linux x86_64 and Windows x64 runtimes.
@@ -36,7 +36,7 @@ Launcher. It is written in Rust, not a Fabric or NeoForge JAR.
   icons follow other players' heads, account for helmets, and disappear behind
   obstructing blocks.
 - **Player controls:** individual volume and mute, source/channel levels, and
-  RMB + mouse wheel adjustment. Player gain multiplies the proximity level.
+  Shift + RMB + mouse wheel adjustment. Player gain multiplies the proximity level.
 - **Six settings tabs:** Devices, Volume, Activation, Overlay, Advanced, Hotkeys.
   Device selection, voice activation, key chords, microphone preview, and RNNoise.
 - **One package:** Linux x86_64 and Windows x64 runtimes, including checked Opus,
@@ -49,10 +49,12 @@ Launcher. It is written in Rust, not a Fabric or NeoForge JAR.
 | Open voice settings | **V** |
 | Push to talk | Hold **Left Alt** |
 | Toggle microphone mute | **M** |
-| Adjust the targeted player's volume | Hold **RMB** and scroll; Shift also works |
+| Adjust the targeted player's volume | Hold **Shift + RMB** and scroll |
 
 Bindings can be changed in **Hotkeys**. Existing saved bindings take precedence.
 The local microphone preview is not sent to the server.
+The player-volume indicator appears only after the volume actually changes;
+holding RMB or Shift alone does not show it.
 
 ## Install
 
@@ -93,7 +95,7 @@ adapters; see the [matrix and upstream fix](docs/SERVER_COMPATIBILITY.md).
 Earlier checks cover PTT on eight screens, player volume, English UI, camera
 alignment, helmet/crouch clearance, and block-shape visibility.
 The engine has **22 engine tests** and the
-adapter has **4 regression tests**. Windows x64 cross-checking passes; actual
+adapter has **5 regression tests**. Windows x64 cross-checking passes; actual
 Windows GUI and physical audio-device testing is still outstanding.
 
 See [VALIDATION.md](VALIDATION.md) and [PARITY.md](PARITY.md) for the evidence and

@@ -8,6 +8,7 @@ An unofficial, independently written Rust client compatible with Plasmo Voice 2.
 - Proximity voice with distance attenuation, stereo positioning, optional HRTF and noise suppression.
 - Push to talk over normal menus, a foreground microphone indicator, and configurable key bindings.
 - Six settings tabs, device selection, microphone preview, and per-player/source volume and mute.
+- Shift + RMB + scroll adjusts a targeted player; its volume indicator appears only after an actual change.
 - Pixel head icons with current-frame positioning, helmet clearance and block-shape visibility.
 - One native .hnmod with Linux x86_64 and Windows x64 runtimes; English and Russian UI.
 

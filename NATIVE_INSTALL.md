@@ -2,8 +2,8 @@
 
 ## Current status
 
-Download `plasmo-voice-0.5.0.hnmod` from
-[Releases](https://github.com/rison1337/horizon-plasmo-voice/releases/tag/v0.5.0).
+Download `plasmo-voice-0.5.1.hnmod` from
+[Releases](https://github.com/rison1337/horizon-plasmo-voice/releases/tag/v0.5.1).
 Use a Horizon Nightly with native API **411 or newer**. Both required extensions
 are officially registered by [Horizon PR #9812](https://github.com/horizon-rust/horizon/pull/9812).
 The release records the tested public Horizon commit
@@ -71,9 +71,11 @@ sent to the server. The overlay position and size are configurable. A held-PTT
 indicator and active-transmission indication represent different states; a
 muted microphone does not transmit just because the key is held.
 
-Aim at another player, hold **RMB**, and scroll to change their individual
-volume. Shift is supported. The normal hotbar wheel action remains available
-when this adjustment is not active. Individual, source and master gains multiply.
+Aim at another player, hold **Shift + RMB**, and scroll to change their individual
+volume. Either Shift key works. The indicator appears only after an actual
+change and fades after 1.5 seconds; holding the buttons alone does not show it.
+Ordinary scrolling keeps its normal hotbar behavior. Individual, source and
+master gains multiply.
 
 ## Privacy
 

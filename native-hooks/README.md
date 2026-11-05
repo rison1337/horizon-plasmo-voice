@@ -1,4 +1,4 @@
-# Plasmo Voice 0.5.0: Hooks / Host
+# Plasmo Voice 0.5.1: Hooks / Host
 
 `native-api/` is the complete public-API adapter for the existing Rust voice
 engine. Its entry point is `hooks() -> Box<dyn Hooks>`; the ordinary `.hnmod`
@@ -28,7 +28,7 @@ can use compatible newer Nightlies; no private source cache is required.
 
 ## Installation
 
-Put `plasmo-voice-0.5.0.hnmod` from the GitHub Release
+Put `plasmo-voice-0.5.1.hnmod` from the GitHub Release
 in the selected instance's
 `horizon-native-mods/`. Enable `plasmo_voice` on the Mods page, select
 **Performance**, Build, then Play. For a 1.21.11 server, also set the environment
@@ -49,6 +49,11 @@ with helmet clearance, visual clipping, per-player volume multiplied by the
 proximity level, wheel/chord control, distance visualization, mute states,
 and server-controlled activations/sources. English and Russian are included.
 The engine runs on its worker; the adapter uses owned client snapshots.
+Player volume uses Shift + the action key (RMB by default) + scroll. Both Shift
+keys work. The indicator appears only after an actual change, then expires
+after 1.5 seconds even if the buttons remain held. Normal scrolling still
+switches the hotbar; a targeted adjustment at the volume limit consumes scroll
+without displaying a new change.
 The additional world-canvas PR #8918 is not required: head icons use the current
 camera and visual-shape clipping, including partial blocks and glass.
 
@@ -66,7 +71,7 @@ Build the release against the public registered API (no core patch):
 python3 tools/package_native_api.py --source /path/to/registered/horizon
 ```
 
-This creates `dist/plasmo-voice-0.5.0.hnmod`. To reproduce its core revision:
+This creates `dist/plasmo-voice-0.5.1.hnmod`. To reproduce its core revision:
 
 ```sh
 python3 tools/prepare_native_api.py --horizon /path/to/horizon \

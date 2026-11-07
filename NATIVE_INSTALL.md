@@ -56,11 +56,11 @@ component from 1.21.10/1.21.11 servers. See the
 
 | Platform | Requirements and current verification |
 | --- | --- |
-| Linux x86_64 | GLIBC 2.29+, C compiler, pkg-config, ALSA/libudev development headers; live game tested |
-| Windows x64 | Launcher-provided Rust/MinGW toolchain; cross-check passed, real GUI/devices untested |
+| Linux x86_64 | C/C++, CMake, pkg-config, ALSA/libudev development headers; source-built codec/DSP and API 411 game build pass |
+| Windows x64 GNU | Launcher-provided Rust/MinGW; install CMake and Ninja on PATH; source-built codec/DSP pass under Wine, real GUI/devices untested |
 
 Internet access is needed for the launcher's first source/toolchain build.
-The voice libraries are already bundled. Use Performance for playing; unoptimized
+The complete voice-library sources are bundled and compiled locally. Use Performance for playing; unoptimized
 builds are intended for development and can have much lower frame rates.
 
 ## First use

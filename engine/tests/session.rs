@@ -193,14 +193,24 @@ fn negotiates_over_control_channel_and_connects_real_udp_socket() {
     let quiet_pcm: Vec<_> = (0..960)
         .map(|i| ((i as f32 * 0.0576).sin() * 500.) as i16)
         .collect();
+    // Encoding time must not slow the simulated server's 20 ms packet clock.
+    // Scalar/debug builds on CI can otherwise drift behind playout and measure
+    // packet-loss concealment rather than the configured volume multiplier.
+    let mut packets = (0..36 * 5)
+        .map(|_| {
+            cipher
+                .encrypt(&encoder.encode(&quiet_pcm, 1000).unwrap())
+                .unwrap()
+        })
+        .collect::<Vec<_>>()
+        .into_iter();
     let mut sequence = 200;
     let mut measure = |settings: &Settings| {
         assert!(client.settings(settings.clone()));
         let mut levels = Vec::new();
+        let start = Instant::now();
         for n in 0..36 {
-            let data = cipher
-                .encrypt(&encoder.encode(&quiet_pcm, 1000).unwrap())
-                .unwrap();
+            let data = packets.next().unwrap();
             let mut down = Writer::default();
             down.i32(protocol::MAGIC as i32);
             down.u8(3);
@@ -213,7 +223,8 @@ fn negotiates_over_control_channel_and_connects_real_udp_socket() {
             down.u8(4);
             down.u16(0);
             server.send_to(&down.0, peer).unwrap();
-            thread::sleep(Duration::from_millis(20));
+            let deadline = start + Duration::from_millis((n + 1) * 20);
+            thread::sleep(deadline.saturating_duration_since(Instant::now()));
             if let Some(s) = client.snapshot()
                 && n > 16
                 && s.output_level > 0.00001

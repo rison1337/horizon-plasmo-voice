@@ -71,7 +71,7 @@ fn main() {
     horizon_client::entry::main_with(vec![horizon_plasmo_native::hooks()].into());
 }
 ''')
-# Translations and checked native libraries, installed later through the normal post-build step.
+# Translations; source-built libraries are installed by the normal post-build step.
 shutil.copytree(ROOT/'data',out/'native-data/plasmo_voice',dirs_exist_ok=True)
 cargo=out/'Cargo.toml';text=cargo.read_text()
 for member in ['native-api/plasmo_voice','native-api/plasmo_runtime','crates/plasmo-native-preview']:

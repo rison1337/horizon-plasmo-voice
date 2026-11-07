@@ -637,7 +637,7 @@ pub(super) fn tr(key: &str) -> String {
 pub(super) fn mods(mods: &mut Vec<horizon_client::mod_api::NativeMod>) {
     mods.push(horizon_client::mod_api::NativeMod {
         id: ID.into(),
-        title: "Plasmo Voice 0.5.2".into(),
+        title: "Plasmo Voice 0.5.3".into(),
         description: tr("description"),
         keys: vec![
             ["menu".into(), tr("open_menu"), "key.keyboard.v".into()],

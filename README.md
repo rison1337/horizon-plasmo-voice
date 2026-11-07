@@ -19,10 +19,10 @@ players from Horizon, with positional sound, push to talk, and a familiar voice
 settings menu. This is a native **`.hnmod`**, built into the client by Horizon
 Launcher. It is written in Rust, not a Fabric or NeoForge JAR.
 
-> **0.5.2 · Horizon native API 411 or newer**
+> **0.5.3 · Horizon native API 411 or newer**
 > The Hooks/Host integration uses officially registered Horizon APIs. Download
 > the `.hnmod` from [Releases](https://github.com/rison1337/horizon-plasmo-voice/releases).
-> One package includes both Linux x86_64 and Windows x64 runtimes.
+> One source package builds its audio dependencies on Linux x86_64 and Windows x64.
 > The [Horizon catalog submission](https://github.com/horizon-rust/horizon-mods/pull/305)
 > is pending review; publishing a release does not list it automatically.
 
@@ -39,8 +39,8 @@ Launcher. It is written in Rust, not a Fabric or NeoForge JAR.
   Shift + RMB + mouse wheel adjustment. Player gain multiplies the proximity level.
 - **Six settings tabs:** Devices, Volume, Activation, Overlay, Advanced, Hotkeys.
   Device selection, voice activation, key chords, microphone preview, and RNNoise.
-- **One package:** Linux x86_64 and Windows x64 runtimes, including checked Opus,
-  RNNoise, and OpenAL Soft libraries. English and Russian in-game translations.
+- **One package:** Linux x86_64 and Windows x64 source builds of Opus,
+  RNNoise, and OpenAL Soft. English and Russian in-game translations.
 
 ## Controls
 
@@ -61,7 +61,8 @@ holding RMB or Shift alone does not show it.
 Put the `.hnmod` into your instance's `horizon-native-mods/`, enable
 `plasmo_voice` on the launcher's **Mods** page, select **Performance**, and
 **Build**. Then start the instance with **Play**. The post-build step installs
-and verifies the libraries for the current operating system.
+and verifies the libraries compiled from source for the current operating system.
+Building requires C/C++ compilers and CMake; see the platform requirements below.
 
 Use a Nightly with native API **411 or newer**. The release records the tested
 public source commit; compatible newer Nightlies can build it too.
@@ -94,8 +95,8 @@ checks. An explicit horn instrument still fails in Horizon's two tested 1.21.x
 adapters; see the [matrix and upstream fix](docs/SERVER_COMPATIBILITY.md).
 Earlier checks cover PTT on eight screens, player volume, English UI, camera
 alignment, helmet/crouch clearance, and block-shape visibility.
-The engine has **22 engine tests** and the
-adapter has **5 regression tests**. Windows x64 cross-checking passes; actual
+The engine has **23 regular tests**, two additional DSP checks, and the
+adapter has **6 regression tests**. Windows x64 cross-checking passes; actual
 Windows GUI and physical audio-device testing is still outstanding.
 
 See [VALIDATION.md](VALIDATION.md) and [PARITY.md](PARITY.md) for the evidence and
@@ -107,7 +108,7 @@ limits. Pixel-for-pixel UI or bit-identical audio processing is not claimed.
 | --- | --- |
 | `native-api/` | Hooks/Host adapter, settings UI, original in-game pixel icons |
 | `engine/` | Protocol, UDP/AES/Opus, device I/O, audio processing and spatial sound |
-| `data/runtime/` | Both platforms' libraries, checksums, licenses and source archives |
+| `runtime/` | Verified upstream source archives, CMake/Cargo build rules, install payload |
 | `tools/` | Development staging, packaging, and branding exports |
 | `assets/` | Shared launcher/README icon and GitHub social preview artwork |
 | `publishing/` | Catalog entry and icon submitted for review |

@@ -1,4 +1,4 @@
-//! Resolve the runtime shipped by the native mod relative to the game executable.
+//! Resolve the source-built runtime relative to the game executable.
 //! Absolute paths avoid dependence on the launcher's working directory or PATH.
 use crate::Result;
 use libloading::Library;
@@ -37,11 +37,12 @@ pub(crate) unsafe fn load(names: &[&str]) -> Result<Library> {
             }
         }
     }
-    // Developers and existing installations may still use system libraries.
+    // Tests and development use only this Cargo build's verified source output.
+    // Never silently pick a system codec or an unrelated DLL from PATH.
     for name in names {
-        // SAFETY: callers supply only the fixed public API names below.
-        if let Ok(lib) = unsafe { Library::new(name) } {
-            return Ok(lib);
+        let path = horizon_plasmo_runtime::built_directory().join(name);
+        if path.is_file() {
+            return unsafe { Library::new(&path) }.map_err(|e| format!("{}: {e}", path.display()));
         }
     }
     Err(format!("Voice library missing: {}", names.join(" / ")))

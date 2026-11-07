@@ -1,13 +1,13 @@
 # Publishing checklist and prepared catalog entry
 
 The owner authorized public source and a catalog submission after Horizon
-PR #9812 merged. Version 0.5.2 uses the official native API minimum **411**.
+PR #9812 merged. Version 0.5.3 uses the official native API minimum **411**.
 The files under `publishing/horizon-mods/` are the submission material. Catalog
 acceptance is a separate maintainer decision; a GitHub Release alone does not
 make the mod appear in Horizon Launcher.
 
 The source is public and the normal
-[v0.5.2 release](https://github.com/rison1337/horizon-plasmo-voice/releases/tag/v0.5.2)
+[v0.5.3 release](https://github.com/rison1337/horizon-plasmo-voice/releases/tag/v0.5.3)
 is published. [Catalog PR #305](https://github.com/horizon-rust/horizon-mods/pull/305)
 contains the entry, icon and local check results. It requests the reviewer's
 required staging upload; neither the release nor this submission claims catalog
@@ -54,6 +54,15 @@ image for publication instead of changing this repository's visibility.
 Reference: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/customizing-your-repositorys-social-media-preview
 
 ## Release notes
+
+**0.5.3 — source-built audio dependencies**
+
+- Removes all six prebuilt Linux/Windows native libraries from the package.
+- Vendors exact upstream Opus 1.6.1, RNNoise 0.2 and OpenAL Soft 1.25.2 sources;
+  SHA-256 verification and local CMake compilation happen during the mod build.
+- Keeps complete source, licenses and build provenance with the installed runtime.
+- Adds Windows engine/DSP CI and a source-only package inspection tool.
+- Requires C/C++ and CMake; Windows GNU also requires Ninja on PATH.
 
 **0.5.2 — connection indicators**
 

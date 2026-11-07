@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.5.3 — 2026-11-07
+
+- Replaces all six prebuilt Linux/Windows audio libraries with complete upstream
+  sources compiled during the mod build. Cargo verifies source archives before
+  CMake builds Opus, RNNoise and OpenAL Soft; no build-time codec download.
+- Retains Opus voice, RNNoise suppression and OpenAL HRTF through the same public
+  APIs. Generic codec builds avoid host-specific CPU instructions.
+- Installs local compiler outputs, complete corresponding sources and notices;
+  removes arbitrary system/PATH codec fallback. Windows GNU requires CMake/Ninja
+  alongside MinGW. Adds Windows source-build codec/DSP CI.
+
 ## 0.5.2 — 2026-11-06
 
 - Hides the activation HUD on ordinary servers until a Plasmo Voice handshake

@@ -2,43 +2,48 @@
 
 ## Engine
 
-Install stable Rust, a C compiler and the development packages used by CPAL.
-For example, on Debian/Ubuntu:
+Install stable Rust, C/C++ compilers, CMake and the development packages used
+by CPAL. For example, on Debian/Ubuntu:
 
 ```sh
-sudo apt-get install build-essential pkg-config libasound2-dev libudev-dev
-LD_LIBRARY_PATH="$PWD/data/runtime/linux-x86_64" cargo test --workspace --locked
+sudo apt-get install build-essential cmake pkg-config libasound2-dev libudev-dev
+cargo test --workspace --locked
+cargo test --workspace --test hrtf --test denoise -- --ignored
+cargo run --locked -p horizon-plasmo-engine --bin plasmo-voice-runtime -- --check
 cargo fmt --all -- --check
 cargo clippy --workspace --all-targets --locked -- -D warnings
 ```
 
-These commands exercise the standalone Rust engine. They do not by themselves
-compile the Horizon adapter or launch a game.
+These commands exercise the standalone engine; they do not launch a game.
+No system Opus, RNNoise or OpenAL install or library-path override is required.
 
-The test-only library path selects this repository's bundled Linux runtime.
-Players do not need it: the launcher's post-build step installs libraries where
-the game loads them by absolute path. CI also runs the codec/DSP self-check in
-loopback mode without physical audio devices.
+### Reviewable native dependencies
 
-### Linux runtime portability
+`runtime/build.rs` verifies the SHA-256 of the three immutable upstream source
+archives in `runtime/data/sources/`, extracts them into Cargo's `OUT_DIR`, and
+runs CMake to compile shared libraries for the target. Its build does not fetch
+anything from the network. `runtime/data/sources.json` lists original URLs,
+versions, licences and archive hashes. The unmodified source archives are the
+reviewable payload; no `.so`, `.dll`, object or executable is bundled.
 
-The bundled Opus 1.6.1 and RNNoise 0.2 use unmodified upstream release sources
-and `CFLAGS="-O2 -march=x86-64 -mtune=generic"`. Build shared libraries without
-host-specific ISA flags; keep Opus runtime CPU detection enabled and configure
-RNNoise with `--enable-x86-rtcd`. Source checksums are in
-`data/runtime/README.txt`; retain the upstream BSD notices.
+Opus 1.6.1 and RNNoise 0.2 use generic scalar C; baseline x86_64 flags avoid
+host-specific CPU instructions. OpenAL Soft 1.25.2 retains upstream runtime
+CPU dispatch and its embedded HRTF dataset, with only loopback/null backends.
+CPAL continues to own the user's recording and playback devices. OpenAL stays
+a separately loaded LGPL library; no implementation is copied into Rust.
 
-Build/link against a GLIBC sysroot whose exported ABI is no newer than 2.29.
-When rebuilding on a newer development machine, verify `readelf -V` output:
-linking against its host libm can introduce newer versioned math symbols even
-with baseline CPU flags. Exclude packed-relative-relocation requirements.
-Update the runtime manifest's SHA-256 values after stripping the binaries.
+The post-build installer embeds only the libraries produced by that Cargo
+build. It installs those outputs, licence notices, and complete corresponding
+source archives beside the executable, then tests Opus/RNNoise/HRTF without
+physical devices. Its receipt records hashes of installed outputs. The loader
+uses absolute installed paths, or that build's output for development; it never
+falls back to an arbitrary system codec or DLL on PATH.
 
-Run the engine tests and installer self-check against the rebuilt libraries.
-CI also runs `qemu-x86_64 -cpu qemu64 target/debug/plasmo-voice-runtime --check`
-with the bundled library path, exercising a CPU without AVX. This check caught
-SIGILL in the previous distribution-specific binaries. QEMU and the private
-userspace used locally are test tools, not part of the distributed mod.
+Source builds use the player's local C/C++ ABI, rather than distributing a
+precompiled library tied to the developer's GLIBC. Linux needs the headers
+above. Windows x64 GNU needs MinGW-w64 C/C++ and CMake and Ninja on PATH (the launcher
+provides its Rust/MinGW toolchain; install CMake and Ninja if absent). Windows MSVC and
+macOS are not validated targets. CI checks baseline CPU codec/DSP loopback.
 
 ## Hooks/Host adapter
 
@@ -70,7 +75,7 @@ API level you have tested:
 python3 tools/package_native_api.py --source /path/to/registered/horizon
 ```
 
-The output is `dist/plasmo-voice-0.5.2.hnmod`. To reproduce the release's core
+The output is `dist/plasmo-voice-0.5.3.hnmod`. To reproduce the release's core
 revision, stage it explicitly:
 
 ```sh

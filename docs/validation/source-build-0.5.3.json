@@ -1,0 +1,144 @@
+{
+  "version": "0.5.3",
+  "date": "2026-11-07",
+  "core": "d52ff7a6f783a164043549f5f04645d5324d0d8a",
+  "hooks": 411,
+  "linux": {
+    "engine_tests_passed": 23,
+    "opt_in_dsp_tests_passed": 2,
+    "adapter_tests_passed": 6,
+    "engine_clippy": "pass",
+    "adapter_clippy": "pass",
+    "runtime_api_check": "pass",
+    "repeat_install_and_hashes": "pass",
+    "optimized_api_411_game_build": "pass (5m48s)",
+    "exact_packaged_installer": "build, install, repeat install and 9 file hashes pass"
+  },
+  "windows_gnu": {
+    "cross_compilation": "pass",
+    "imports": {
+      "soft_oal.dll": [
+        "KERNEL32.dll",
+        "api-ms-win-crt-convert-l1-1-0.dll",
+        "api-ms-win-crt-environment-l1-1-0.dll",
+        "api-ms-win-crt-filesystem-l1-1-0.dll",
+        "api-ms-win-crt-heap-l1-1-0.dll",
+        "api-ms-win-crt-locale-l1-1-0.dll",
+        "api-ms-win-crt-math-l1-1-0.dll",
+        "api-ms-win-crt-private-l1-1-0.dll",
+        "api-ms-win-crt-runtime-l1-1-0.dll",
+        "api-ms-win-crt-stdio-l1-1-0.dll",
+        "api-ms-win-crt-string-l1-1-0.dll",
+        "api-ms-win-crt-time-l1-1-0.dll",
+        "api-ms-win-crt-utility-l1-1-0.dll",
+        "ole32.dll",
+        "SHELL32.dll"
+      ],
+      "libopus-0.dll": [
+        "ADVAPI32.dll",
+        "KERNEL32.dll",
+        "api-ms-win-crt-heap-l1-1-0.dll",
+        "api-ms-win-crt-math-l1-1-0.dll",
+        "api-ms-win-crt-private-l1-1-0.dll",
+        "api-ms-win-crt-runtime-l1-1-0.dll",
+        "api-ms-win-crt-stdio-l1-1-0.dll",
+        "api-ms-win-crt-string-l1-1-0.dll"
+      ],
+      "librnnoise-0.dll": [
+        "KERNEL32.dll",
+        "api-ms-win-crt-heap-l1-1-0.dll",
+        "api-ms-win-crt-math-l1-1-0.dll",
+        "api-ms-win-crt-private-l1-1-0.dll",
+        "api-ms-win-crt-runtime-l1-1-0.dll",
+        "api-ms-win-crt-stdio-l1-1-0.dll",
+        "api-ms-win-crt-string-l1-1-0.dll"
+      ]
+    },
+    "wine": {
+      "result": "pass",
+      "scope": "Windows GNU executable under Wine; no physical devices",
+      "repeat_install": true,
+      "receipt": {
+        "built_from_source": true,
+        "files": [
+          {
+            "path": "lib/libopus-0.dll",
+            "sha256": "75b634b90cd8e52d23fa190eb599df394ddf895b4030f12a8ee3eb169e25f428"
+          },
+          {
+            "path": "lib/librnnoise-0.dll",
+            "sha256": "5a72dfdcd888e629d90704b8c4e61c70f346c0bafd290982f10aec2efda84b9f"
+          },
+          {
+            "path": "lib/soft_oal.dll",
+            "sha256": "cfaf72a0e578de34d34ab4a57a2628d1adda1414469c37960cfa61654fd292a8"
+          },
+          {
+            "path": "licenses/Opus-BSD.txt",
+            "sha256": "01e1167d54a096d123cf6dfbbeb19587278845c6481d2d66d545669846079551"
+          },
+          {
+            "path": "licenses/RNNoise-BSD.txt",
+            "sha256": "45d37ca1cdb278c088e1aa85e0e65ca3a534ed86a28dcc96ca16810248a61d35"
+          },
+          {
+            "path": "licenses/OpenAL-Soft-LGPL.txt",
+            "sha256": "d808ce217e5b611854da622b57ec29fe545584c48bc5352fae72a4b6e5074a15"
+          },
+          {
+            "path": "sources/opus-1.6.1.tar.gz",
+            "sha256": "6ffcb593207be92584df15b32466ed64bbec99109f007c82205f0194572411a1"
+          },
+          {
+            "path": "sources/rnnoise-0.2.tar.gz",
+            "sha256": "90fce4b00b9ff24c08dbfe31b82ffd43bae383d85c5535676d28b0a2b11c0d37"
+          },
+          {
+            "path": "sources/openal-soft-1.25.2.tar.gz",
+            "sha256": "fb27e5839aa11f0e5b9d33756965291fad5d6909ab928ea1f796f4a1a6877894"
+          }
+        ],
+        "hrtf_loopback": true,
+        "opus": true,
+        "rnnoise": true,
+        "schema": 2,
+        "target": "windows-x86_64"
+      }
+    }
+  },
+  "sources_verified_against_official_downloads": [
+    {
+      "archive": "opus-1.6.1.tar.gz",
+      "matches": true,
+      "sha256": "6ffcb593207be92584df15b32466ed64bbec99109f007c82205f0194572411a1",
+      "url": "https://downloads.xiph.org/releases/opus/opus-1.6.1.tar.gz"
+    },
+    {
+      "archive": "openal-soft-1.25.2.tar.gz",
+      "matches": true,
+      "sha256": "fb27e5839aa11f0e5b9d33756965291fad5d6909ab928ea1f796f4a1a6877894",
+      "url": "https://github.com/kcat/openal-soft/archive/refs/tags/1.25.2.tar.gz"
+    },
+    {
+      "name": "RNNoise",
+      "url": "https://github.com/xiph/rnnoise/releases/download/v0.2/rnnoise-0.2.tar.gz",
+      "sha256": "90fce4b00b9ff24c08dbfe31b82ffd43bae383d85c5535676d28b0a2b11c0d37",
+      "bytes": 2294308,
+      "matches": true
+    }
+  ],
+  "artifact_inspection": {
+    "prebuilt_executable_payloads": 0,
+    "source_files": 1007,
+    "historical_052_bundle_rejected": true
+  },
+  "limits": [
+    "No Windows GUI or physical-device validation.",
+    "Windows native-runner and Linux no-AVX results are recorded by the linked CI run.",
+    "Earlier live UI and five-version matrix retain their original scope."
+  ],
+  "requirements": [
+    "C/C++ toolchain and CMake",
+    "Windows GNU also requires Ninja; launcher does not currently provision CMake/Ninja."
+  ]
+}

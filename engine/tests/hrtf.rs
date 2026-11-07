@@ -1,9 +1,9 @@
 use horizon_plasmo_engine::hrtf::Hrtf;
 #[test]
-#[ignore = "requires the optional OpenAL Soft system library and HRTF data"]
+#[ignore = "explicit source-built HRTF DSP check"]
 fn loopback_hrtf_tracks_left_and_right_without_opening_audio_devices() {
     fn energy(x: f32, gain: f32) -> [f32; 2] {
-        let mut renderer = Hrtf::new(5).expect("OpenAL Soft with HRTF required for explicit check");
+        let mut renderer = Hrtf::new(5).expect("source-built OpenAL Soft with HRTF");
         let mut energy = [0.; 2];
         for n in 0..8 {
             let pcm: Vec<_> = (0..960)

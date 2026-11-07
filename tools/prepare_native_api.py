@@ -44,7 +44,10 @@ manifest=manifest.replace('../../horizon/crates/horizon-protocol','../../crates/
 manifest=manifest.replace('path = "../engine"','path = "engine"')
 (api/'Cargo.toml').write_text(manifest)
 shutil.copytree(ROOT/'engine/src',api/'engine/src',dirs_exist_ok=True)
-shutil.copyfile(ROOT/'engine/Cargo.toml',api/'engine/Cargo.toml')
+(api/'engine/Cargo.toml').write_text((ROOT/'engine/Cargo.toml').read_text().replace(
+    'path = "../runtime"', 'path = "../../plasmo_runtime"'))
+shutil.copytree(ROOT/'runtime',out/'native-api/plasmo_runtime',dirs_exist_ok=True,
+                ignore=shutil.ignore_patterns('target', '__pycache__'))
 wrapper=out/'crates/plasmo-native-preview';(wrapper/'src').mkdir(parents=True,exist_ok=True)
 (wrapper/'Cargo.toml').write_text('''[package]
 name = "plasmo-native-preview"
@@ -71,7 +74,7 @@ fn main() {
 # Translations and checked native libraries, installed later through the normal post-build step.
 shutil.copytree(ROOT/'data',out/'native-data/plasmo_voice',dirs_exist_ok=True)
 cargo=out/'Cargo.toml';text=cargo.read_text()
-for member in ['native-api/plasmo_voice','crates/plasmo-native-preview']:
+for member in ['native-api/plasmo_voice','native-api/plasmo_runtime','crates/plasmo-native-preview']:
     if '"'+member+'"' not in text:text=text.replace('members = [','members = [\n    "'+member+'",',1)
 cargo.write_text(text)
 print(out)

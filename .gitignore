@@ -26,3 +26,4 @@ session*.json
 !/tools/package_native_api.py
 !/tools/export_branding.py
 !/tools/check_native_api_ptt.py
+!/tools/check_source_bundle.py

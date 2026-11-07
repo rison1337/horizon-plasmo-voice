@@ -38,24 +38,28 @@ Additional interoperability and behavior references (no implementation copied):
   https://openal-soft.org/openal-extensions/SOFT_loopback.txt
   https://openal-soft.org/openal-extensions/SOFT_HRTF.txt
   https://openal-soft.org/openal-extensions/EXT_thread_local_context.txt
-The native .hnmod includes dynamically loaded Opus 1.6.1 and RNNoise 0.2 (BSD),
-and unmodified OpenAL Soft binaries (LGPL): Linux from LWJGL 3.3.3 at
-LWJGL-CI/OpenAL-Soft d9fed51aa6391debc31dbbca550f055c980afe70, Windows 1.25.2.
-Their license notices and complete corresponding OpenAL source archives are
-in data/runtime/licenses/ and data/runtime/sources/ and are installed beside
-the libraries. The mod is MIT; no OpenAL implementation was read or copied into
-its implementation. Libraries can be replaced in native-data/plasmo_voice/lib/.
-UI icons are code-drawn native primitives; original mod graphic assets are not bundled.
+Version 0.5.3 builds its audio dependencies from complete unmodified source
+archives during Cargo compilation. No precompiled .so/.dll or executable is
+included in the native mod package. Source URLs, versions, licences and verified
+SHA-256 values are in runtime/data/sources.json:
 
-The 0.5.1 Linux Opus/RNNoise binaries are unmodified upstream releases rebuilt
-with baseline x86_64 flags and runtime CPU detection. Build/license references:
-- Opus 1.6.1 (BSD), COPYING in the release archive:
-  https://downloads.xiph.org/releases/opus/opus-1.6.1.tar.gz
-- RNNoise 0.2 (BSD), COPYING in the release archive:
-  https://github.com/xiph/rnnoise/releases/tag/v0.2
-Only their license/build configuration and published APIs were consulted;
-no foreign codec/DSP implementation was copied into the Rust engine.
+- Opus 1.6.1: BSD-3-Clause; COPYING in its release archive.
+- RNNoise 0.2: BSD-3-Clause; COPYING in its release archive.
+- OpenAL Soft 1.25.2: LGPL-2.0-or-later; COPYING and the individual upstream file
+  notices in its complete source archive. It is built as a separate shared
+  library and accessed only through the documented API. Its source archive is
+  included in the .hnmod and installed alongside the locally built library;
+  users can rebuild or replace the shared library. Original implementation
+  sources were not read or adapted into the independent Rust code.
 
+The Cargo build verifies each archive before extraction. Opus/RNNoise use their
+generic C implementations, and OpenAL's published CMake build supplies its
+loopback renderer and embedded HRTF data. Complete source notices are retained;
+the post-build installer copies the three upstream COPYING files to licenses/.
+UI icons remain original code-drawn primitives.
+
+Earlier 0.5.0-0.5.2 releases carried prebuilt libraries and their notices. Those
+immutable historical releases remain unchanged; this notice describes 0.5.3.
 
 Historical attribution (local 0.4.x only; not included in the 0.5.0 API adapter):
 Item component compatibility was adapted from Horizon PR #8659,

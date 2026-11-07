@@ -1,8 +1,8 @@
 use horizon_plasmo_engine::{activation::level, denoise::Denoiser};
 #[test]
-#[ignore = "requires the optional RNNoise system library"]
+#[ignore = "explicit source-built RNNoise DSP check"]
 fn rnnoise_reduces_steady_background_noise_without_recording_a_device() {
-    let mut denoiser = Denoiser::load().expect("RNNoise must be installed for this explicit check");
+    let mut denoiser = Denoiser::load().expect("source-built RNNoise must load");
     let mut seed = 7u32;
     let mut before = 0.;
     let mut after = 0.;

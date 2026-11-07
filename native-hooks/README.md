@@ -1,4 +1,4 @@
-# Plasmo Voice 0.5.2: Hooks / Host
+# Plasmo Voice 0.5.3: Hooks / Host
 
 `native-api/` is the complete public-API adapter for the existing Rust voice
 engine. Its entry point is `hooks() -> Box<dyn Hooks>`; the ordinary `.hnmod`
@@ -28,17 +28,20 @@ can use compatible newer Nightlies; no private source cache is required.
 
 ## Installation
 
-Put `plasmo-voice-0.5.2.hnmod` from the GitHub Release
+Put `plasmo-voice-0.5.3.hnmod` from the GitHub Release
 in the selected instance's
 `horizon-native-mods/`. Enable `plasmo_voice` on the Mods page, select
 **Performance**, Build, then Play. For a 1.21.11 server, also set the environment
 variable above. Do not extract the `.hnmod` or install the older 0.4.4 alongside it.
 
-The one file includes Linux x86_64 and Windows x64 runtimes. Its independent
-Rust post-build installer verifies and installs the required libraries for the
-current system. No separate client archive or library search-path setting is
-needed. Building on Linux requires a C compiler, pkg-config and ALSA/libudev
-headers; the launcher obtains its Rust toolchain, and Windows' MinGW toolchain.
+The one file contains complete, checksum-verified source archives of Opus
+1.6.1, RNNoise 0.2 and OpenAL Soft 1.25.2, plus the Rust/CMake build rules.
+Cargo builds their shared libraries locally; no precompiled executable payload
+is included. The Rust post-build installer installs and verifies those local
+outputs, notices and source archives. No manual DLL copy or library-path setting
+is needed. Linux requires C/C++ compilers, CMake, pkg-config and ALSA/libudev
+headers. Windows GNU requires MinGW-w64, CMake and Ninja on PATH; the launcher
+provides its Rust/MinGW toolchain. Windows MSVC and macOS are not validated.
 
 ## Preserved functionality
 
@@ -75,7 +78,7 @@ Build the release against the public registered API (no core patch):
 python3 tools/package_native_api.py --source /path/to/registered/horizon
 ```
 
-This creates `dist/plasmo-voice-0.5.2.hnmod`. To reproduce its core revision:
+This creates `dist/plasmo-voice-0.5.3.hnmod`. To reproduce its core revision:
 
 ```sh
 python3 tools/prepare_native_api.py --horizon /path/to/horizon \

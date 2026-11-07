@@ -2,8 +2,8 @@
 
 ## Current status
 
-Download `plasmo-voice-0.5.2.hnmod` from
-[Releases](https://github.com/rison1337/horizon-plasmo-voice/releases/tag/v0.5.2).
+Download `plasmo-voice-0.5.3.hnmod` from
+[Releases](https://github.com/rison1337/horizon-plasmo-voice/releases/tag/v0.5.3).
 Use a Horizon Nightly with native API **411 or newer**. Both required extensions
 are officially registered by [Horizon PR #9812](https://github.com/horizon-rust/horizon/pull/9812).
 The release records the tested public Horizon commit
@@ -23,8 +23,11 @@ See [Development](docs/DEVELOPMENT.md) to build the package yourself.
 
 Keep only one version of `plasmo_voice` enabled. No client archive, launcher
 script, manual DLL copy, or library search-path setting is required. The package
-contains runtimes for Linux x86_64 and Windows x64; its Rust post-build step
-installs the current system's files and checks their hashes and codec/DSP APIs.
+contains reviewable sources for Linux x86_64 and Windows x64. Cargo builds
+Opus, RNNoise and OpenAL Soft, and the Rust post-build step installs the local
+compiler outputs and verifies codec/DSP APIs. C/C++ compilers and CMake must be
+available. On Debian/Ubuntu install `build-essential cmake pkg-config libasound2-dev
+libudev-dev`; on Windows GNU use the launcher's MinGW toolchain with CMake and Ninja on PATH.
 
 ## Server versions
 

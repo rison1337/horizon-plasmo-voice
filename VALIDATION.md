@@ -3,6 +3,43 @@
 Recorded on **5 November 2026** for the 0.5.0 API adapter. These are completed
 checks, not a claim that every platform or audio device has been tested.
 
+
+## 0.5.3 source-built audio dependencies, 7 November 2026
+
+Catalog review #305 requested removal of all six opaque native libraries. This
+version replaces them with complete, byte-verified upstream source archives:
+Opus 1.6.1, RNNoise 0.2 and OpenAL Soft 1.25.2. Cargo verifies their SHA-256
+values and compiles shared libraries through CMake in OUT_DIR. The source build
+uses no network. The installer copies only these compiler outputs, original
+licenses and complete corresponding source into the instance data directory.
+Installed libraries take precedence; there is no system/PATH codec fallback.
+
+Linux: **23 engine tests**, the **two opt-in DSP tests**, and **six API 411
+adapter regressions** pass. The DSP tests measure RNNoise noise reduction,
+left/right HRTF positioning and independent gain (4x amplitude / 16x energy).
+Engine and adapter Clippy pass with warnings denied; the optimized API 411 game
+build completes in 5m48s. The exact packaged installer compiles separately. The post-build installer
+passes Opus round-trip, RNNoise and HRTF loopback checks without physical
+devices; a repeated installation preserves identical files and valid hashes.
+
+Windows GNU: all three DLLs compile from the same archives. Their imports
+contain only Windows/UCRT libraries, without additional GCC, C++ or pthread
+runtime DLLs. The Windows installer, codec/DSP checks and repeat installation
+also pass under Wine. This is not a Windows GUI or physical-device test.
+The CI workflow additionally runs engine/DSP checks on an actual Windows runner
+and the Linux runtime on QEMU's baseline qemu64 CPU without AVX.
+
+The source-only bundle checker validates ZIP integrity, each upstream archive,
+source member paths and executable signatures/extensions, finding **zero
+prebuilt executable payloads** and **1,007 source files**. It rejects the
+historical 0.5.2 bundle. Earlier UI and five-server checks below retain their
+original scope; they were not repeated as a new version matrix for 0.5.3.
+
+Build requirements are explicit: C/C++ and CMake on Linux, and Windows GNU
+MinGW-w64 plus CMake and Ninja on PATH. The launcher supplies Rust/MinGW;
+it does not currently provision CMake/Ninja. The mod still requires registered
+Hooks/Host API 411 and has no private Game or Minecraft protocol injections.
+
 ## 0.5.2 connection indicators
 
 Six adapter regressions pass on registered API 411 core

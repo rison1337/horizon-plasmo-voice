@@ -16,7 +16,7 @@ import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
 MIXINS = "e8cd0aa38cffef49cb2e088ef716baa107148c02"
-VERSION = "0.5.2"
+VERSION = "0.5.3"
 REQUIRED_HOOKS = {"gui_render_post", "client_disconnecting", "client_stopping", "menu_background"}
 REQUIRED_HELPERS = {"client_state", "client_entities", "client_heads", "client_profiles",
                     "client_visual_clear", "client_block_obstruction", "gui_paint",
@@ -52,17 +52,26 @@ bin = "plasmo-voice-runtime"
     manifest = manifest.replace('path = "../engine"', 'path = "engine"')
     (api / "Cargo.toml").write_text(manifest)
     shutil.copytree(ROOT / "engine/src", api / "engine/src")
-    shutil.copyfile(ROOT / "engine/Cargo.toml", api / "engine/Cargo.toml")
-    # Mixin crates are dependencies of the game. The independent installer must
-    # not depend on the API crate (which itself depends on the game).
+    (api / "engine/Cargo.toml").write_text((ROOT / "engine/Cargo.toml").read_text().replace(
+        'path = "../runtime"', 'path = "../../runtime"'))
+    shutil.copytree(ROOT / "runtime", destination / "runtime",
+                    ignore=shutil.ignore_patterns("target", "__pycache__"))
+    # The installer depends only on the standalone engine/runtime, never the
+    # adapter (which depends on the game). Sources are packaged exactly once.
     installer = destination / "runtime-installer"
-    shutil.copytree(ROOT / "engine/src", installer / "src")
-    (installer / "Cargo.toml").write_text(
-        (ROOT / "engine/Cargo.toml").read_text().replace(
-            'name = "horizon-plasmo-engine"', 'name = "horizon-plasmo-runtime-installer"'))
-    program = installer / "src/bin/plasmo-voice-runtime.rs"
-    program.write_text(program.read_text().replace(
-        "horizon_plasmo_engine", "horizon_plasmo_runtime_installer"))
+    (installer / "src/bin").mkdir(parents=True)
+    shutil.copyfile(ROOT / "engine/src/bin/plasmo-voice-runtime.rs", installer / "src/bin/plasmo-voice-runtime.rs")
+    (installer / "Cargo.toml").write_text('''[package]
+name = "horizon-plasmo-runtime-installer"
+version = "0.1.0"
+edition = "2024"
+license = "MIT"
+[dependencies]
+horizon-plasmo-engine = { path = "../api/engine" }
+horizon-plasmo-runtime = { path = "../runtime" }
+serde_json = "1"
+sha2 = "0.10.9"
+''')
     shutil.copytree(ROOT / "data", destination / "data")
     shutil.copyfile(ROOT / "LICENSE", destination / "LICENSE")
     shutil.copyfile(ROOT / "THIRD_PARTY_NOTICES.md", destination / "NOTICE.md")
@@ -82,6 +91,11 @@ def main():
     parser.add_argument("--stage", type=Path, help="also keep an unpacked bundle folder")
     parser.add_argument("--output", type=Path)
     args = parser.parse_args()
+    forbidden = [path for path in (ROOT / "data").rglob("*")
+                 if path.is_file() and (path.name.endswith((".dll", ".so", ".dylib", ".exe", ".a", ".o"))
+                                        or ".so." in path.name)]
+    if forbidden:
+        parser.error("prebuilt executable payloads are forbidden: " + ", ".join(map(str, forbidden)))
     source = args.source.resolve(strict=True)
     revision = subprocess.check_output(
         ["git", "-C", str(source), "rev-parse", "HEAD"], text=True).strip()

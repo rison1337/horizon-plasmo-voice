@@ -14,7 +14,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       - name: Install Linux build dependencies
-        run: sudo apt-get update && sudo apt-get install -y libasound2-dev libudev-dev pkg-config qemu-user
+        run: sudo apt-get update && sudo apt-get install -y libasound2-dev libudev-dev pkg-config cmake ninja-build qemu-user
       - uses: dtolnay/rust-toolchain@stable
         with:
           components: rustfmt, clippy
@@ -24,16 +24,35 @@ jobs:
       - name: Clippy
         run: cargo clippy --workspace --all-targets --locked -- -D warnings
       - name: Engine tests
-        env:
-          LD_LIBRARY_PATH: ${{ github.workspace }}/data/runtime/linux-x86_64
         run: cargo test --workspace --locked
-      - name: Bundled codec and DSP APIs without physical devices
-        env:
-          LD_LIBRARY_PATH: ${{ github.workspace }}/data/runtime/linux-x86_64
+      - name: Source-built noise suppression and spatial audio
+        run: cargo test --workspace --test hrtf --test denoise -- --ignored
+      - name: Source-built codec and DSP APIs without physical devices
         run: cargo run --locked -p horizon-plasmo-engine --bin plasmo-voice-runtime -- --check
       - name: Check development tool syntax
-        run: python3 -m py_compile tools/prepare_native_api.py tools/package_native_api.py tools/export_branding.py
-      - name: Bundled runtime on a baseline CPU without AVX
-        env:
-          LD_LIBRARY_PATH: ${{ github.workspace }}/data/runtime/linux-x86_64
+        run: python3 -m py_compile tools/prepare_native_api.py tools/package_native_api.py tools/check_source_bundle.py tools/export_branding.py
+      - name: Source-built runtime on a baseline CPU without AVX
         run: qemu-x86_64 -cpu qemu64 target/debug/plasmo-voice-runtime --check
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: msys2/setup-msys2@v2
+        with:
+          msystem: MINGW64
+          update: true
+          install: mingw-w64-x86_64-gcc mingw-w64-x86_64-cmake mingw-w64-x86_64-ninja
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: x86_64-pc-windows-gnu
+      - uses: Swatinem/rust-cache@v2
+      - name: Source-built Windows codec and DSP tests
+        shell: pwsh
+        run: |
+          $env:Path = "C:\msys64\mingw64\bin;" + $env:Path
+          cargo test --workspace --locked --target x86_64-pc-windows-gnu
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          cargo test --workspace --locked --target x86_64-pc-windows-gnu --test hrtf --test denoise -- --ignored
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          cargo run --locked --target x86_64-pc-windows-gnu -p horizon-plasmo-engine --bin plasmo-voice-runtime -- --check
+          exit $LASTEXITCODE

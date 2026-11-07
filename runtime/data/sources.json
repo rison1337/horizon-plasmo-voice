@@ -1,0 +1,30 @@
+{
+  "schema": 1,
+  "sources": [
+    {
+      "name": "Opus",
+      "version": "1.6.1",
+      "archive": "opus-1.6.1.tar.gz",
+      "url": "https://downloads.xiph.org/releases/opus/opus-1.6.1.tar.gz",
+      "sha256": "6ffcb593207be92584df15b32466ed64bbec99109f007c82205f0194572411a1",
+      "license": "BSD-3-Clause"
+    },
+    {
+      "name": "RNNoise",
+      "version": "0.2",
+      "archive": "rnnoise-0.2.tar.gz",
+      "url": "https://github.com/xiph/rnnoise/releases/download/v0.2/rnnoise-0.2.tar.gz",
+      "sha256": "90fce4b00b9ff24c08dbfe31b82ffd43bae383d85c5535676d28b0a2b11c0d37",
+      "license": "BSD-3-Clause"
+    },
+    {
+      "name": "OpenAL Soft",
+      "version": "1.25.2",
+      "archive": "openal-soft-1.25.2.tar.gz",
+      "url": "https://github.com/kcat/openal-soft/archive/refs/tags/1.25.2.tar.gz",
+      "sha256": "fb27e5839aa11f0e5b9d33756965291fad5d6909ab928ea1f796f4a1a6877894",
+      "license": "LGPL-2.0-or-later"
+    }
+  ],
+  "build": "Cargo build.rs verifies and extracts archives, CMake compiles shared libraries in OUT_DIR. Baseline x86_64, generic scalar Opus/RNNoise, OpenAL runtime dispatch, loopback and embedded upstream HRTF data. No build-time network or prebuilt codecs."
+}

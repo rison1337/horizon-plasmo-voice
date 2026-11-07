@@ -1,5 +1,5 @@
 [workspace]
-members = ["engine"]
+members = ["engine", "runtime"]
 resolver = "2"
 
 [profile.dev]

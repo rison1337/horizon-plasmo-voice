@@ -134,11 +134,17 @@
   },
   "limits": [
     "No Windows GUI or physical-device validation.",
-    "Windows native-runner and Linux no-AVX results are recorded by the linked CI run.",
     "Earlier live UI and five-version matrix retain their original scope."
   ],
   "requirements": [
     "C/C++ toolchain and CMake",
     "Windows GNU also requires Ninja; launcher does not currently provision CMake/Ninja."
-  ]
+  ],
+  "ci": {
+    "url": "https://github.com/rison1337/horizon-plasmo-voice/actions/runs/42374283485",
+    "commit": "ee24d6248ccd23ea8b359d53b7572903e4c19e5e",
+    "conclusion": "success",
+    "linux_engine_clippy_dsp_and_qemu64_without_avx": "pass",
+    "actual_windows_runner_engine_and_dsp": "pass"
+  }
 }

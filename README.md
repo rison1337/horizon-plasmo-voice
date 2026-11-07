@@ -96,8 +96,9 @@ adapters; see the [matrix and upstream fix](docs/SERVER_COMPATIBILITY.md).
 Earlier checks cover PTT on eight screens, player volume, English UI, camera
 alignment, helmet/crouch clearance, and block-shape visibility.
 The engine has **23 regular tests**, two additional DSP checks, and the
-adapter has **6 regression tests**. Windows x64 cross-checking passes; actual
-Windows GUI and physical audio-device testing is still outstanding.
+adapter has **6 regression tests**. [Linux and Windows CI pass](https://github.com/rison1337/horizon-plasmo-voice/actions/runs/42374283485),
+including source-built codec/DSP tests and Linux QEMU without AVX. Windows GUI
+and physical audio-device testing is still outstanding.
 
 See [VALIDATION.md](VALIDATION.md) and [PARITY.md](PARITY.md) for the evidence and
 limits. Pixel-for-pixel UI or bit-identical audio processing is not claimed.

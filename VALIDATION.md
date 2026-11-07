@@ -26,8 +26,9 @@ Windows GNU: all three DLLs compile from the same archives. Their imports
 contain only Windows/UCRT libraries, without additional GCC, C++ or pthread
 runtime DLLs. The Windows installer, codec/DSP checks and repeat installation
 also pass under Wine. This is not a Windows GUI or physical-device test.
-The CI workflow additionally runs engine/DSP checks on an actual Windows runner
-and the Linux runtime on QEMU's baseline qemu64 CPU without AVX.
+[CI run 42374283485](https://github.com/rison1337/horizon-plasmo-voice/actions/runs/42374283485)
+passes on Linux and an actual Windows runner, including engine/DSP checks and
+the Linux runtime on QEMU's baseline qemu64 CPU without AVX.
 
 The source-only bundle checker validates ZIP integrity, each upstream archive,
 source member paths and executable signatures/extensions, finding **zero

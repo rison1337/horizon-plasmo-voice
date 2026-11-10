@@ -154,7 +154,10 @@ fn build(root: &Path, out: &Path, target: &str) -> Result<Vec<&'static str>> {
             "Ninja",
             "-DCMAKE_SHARED_LINKER_FLAGS=-static -static-libgcc -static-libstdc++",
         ]);
-        if env::var("HOST").ok().as_deref() != Some(target) {
+        // A Windows Rust installation often has an MSVC host even when the
+        // mod targets GNU. MSYS2 provides unprefixed windres.exe in that case;
+        // the prefixed resource compiler is only for cross-OS builds.
+        if !env::var("HOST").unwrap_or_default().contains("windows") {
             config
                 .arg("-DCMAKE_SYSTEM_NAME=Windows")
                 .arg("-DCMAKE_RC_COMPILER=x86_64-w64-mingw32-windres");

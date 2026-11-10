@@ -1,7 +1,7 @@
 # Validation
 
-Recorded on **5 November 2026** for the 0.5.0 API adapter. These are completed
-checks, not a claim that every platform or audio device has been tested.
+Each record names its version and tested core. Completed checks below do not
+claim that every platform or physical audio device has been tested.
 
 ## 0.5.4 current Nightly packaging and disabled audio, 10 November 2026
 
@@ -33,11 +33,16 @@ settings list and voice menu explain the cause in English or Russian. Install
 the missing tools and rebuild to enable voice. No voice network session or
 physical audio device is opened in this mode.
 
-The missing-CMake installer and disabled-worker regressions pass locally.
-CI covers ordinary Linux/Windows builds, Linux without CMake, macOS as an
+All **seven adapter regressions** pass locally, and the new disabled-adapter
+regression also passes in an explicit missing-CMake build. Local checks cover
+the disabled worker/installer, failed CMake commands, and recovery after tool
+installation without cleaning or changing the environment.
+[Source CI](https://github.com/rison1337/horizon-plasmo-voice/actions/runs/42878041030)
+covers ordinary Linux/Windows builds, Linux without CMake, macOS as an
 unsupported target, and real bundle application/trait checking on the exact
-Nightly. Each CI result is linked from the release after completion. Earlier
-live UI, Windows and five-server records below retain their original scope.
+Nightly. Windows builds use the native resource compiler even with an MSVC
+Rust host and GNU target. All four CI jobs pass. Earlier live UI, Windows and
+five-server records below retain their original scope.
 
 ## 0.5.3 source-built audio dependencies, 7 November 2026
 

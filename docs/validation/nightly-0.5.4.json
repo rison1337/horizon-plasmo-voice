@@ -15,16 +15,31 @@
   "local": {
     "engine_tests": 24,
     "opt_in_dsp_tests": 2,
-    "previous_adapter_regressions": 6,
     "missing_cmake_disabled_build": "pass",
     "disabled_codec_and_worker_guard": "pass",
     "failed_cmake_command_disabled_build_and_install": "pass",
-    "missing_cmake_install_and_recovery_without_clean_or_env_change": "pass"
+    "missing_cmake_install_and_recovery_without_clean_or_env_change": "pass",
+    "adapter_regressions": 7,
+    "disabled_adapter_message": "pass"
   },
-  "ci": "Linked in release notes once completed; includes Linux, Windows, unsupported macOS, exact Nightly bundle application and trait checking.",
+  "ci": {
+    "run": "https://github.com/rison1337/horizon-plasmo-voice/actions/runs/42878041030",
+    "source_commit": "c34b165bbae9c376d99c9a00ef092ff1681a93ce",
+    "status": "pass",
+    "jobs": {
+      "engine": "success",
+      "native-bundle": "success",
+      "unsupported-platform": "success",
+      "windows": "success"
+    }
+  },
   "limits": [
     "No physical microphone/speaker or Windows GUI testing.",
     "No additional five-server voice/version matrix.",
     "macOS voice is intentionally disabled; only build/install behavior is tested."
-  ]
+  ],
+  "artifact": {
+    "sha256": "3e87649b98616b1b73309c544c3772fb589efdbcf41e8aa084787a630de37bdf",
+    "bytes": 14274740
+  }
 }

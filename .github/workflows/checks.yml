@@ -107,3 +107,11 @@ jobs:
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           cargo run --locked --target x86_64-pc-windows-gnu -p horizon-plasmo-engine --bin plasmo-voice-runtime -- --check
           exit $LASTEXITCODE
+      - name: Audio build diagnostics
+        if: failure()
+        shell: pwsh
+        run: |
+          Get-ChildItem target -Recurse -Filter audio-build.log | ForEach-Object {
+            Write-Output $_.FullName
+            Get-Content $_.FullName | Select-String -Pattern 'error:|fatal:|FAILED:|CMake Error|undefined reference|cannot find|not found|ninja:|windres:'
+          }

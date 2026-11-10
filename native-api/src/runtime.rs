@@ -182,6 +182,12 @@ fn flush_payloads(game: &mut dyn Host, queue: &mut VecDeque<Vec<u8>>) {
     }
 }
 fn ensure(game: &mut dyn Host, state: &mut State) -> bool {
+    if let Some(message) = unavailable_message() {
+        state.client = None;
+        state.status = Status::Error;
+        state.error = message;
+        return false;
+    }
     if !on(game) || game.client_state().and_then(|v| v.server_address).is_none() {
         return false;
     }
@@ -634,11 +640,18 @@ pub(super) fn tr(key: &str) -> String {
         .unwrap_or(key);
     horizon_client::lang::get_or(&format!("plasmo_voice.{key}"), fallback)
 }
+pub(super) fn unavailable_message() -> Option<String> {
+    horizon_plasmo_engine::audio_runtime::unavailable_reason()
+        .map(|reason| tr(&format!("runtime_{reason}")))
+}
 pub(super) fn mods(mods: &mut Vec<horizon_client::mod_api::NativeMod>) {
     mods.push(horizon_client::mod_api::NativeMod {
         id: ID.into(),
-        title: "Plasmo Voice 0.5.3".into(),
-        description: tr("description"),
+        title: "Plasmo Voice 0.5.4".into(),
+        description: unavailable_message().map_or_else(
+            || tr("description"),
+            |message| format!("{}\n\n{message}", tr("description")),
+        ),
         keys: vec![
             ["menu".into(), tr("open_menu"), "key.keyboard.v".into()],
             ["talk".into(), tr("talk"), "key.keyboard.left.alt".into()],
@@ -767,6 +780,9 @@ fn refresh_icons(game: &mut dyn Host, state: &mut State) {
 }
 pub(super) fn settings(_game: &mut dyn Host, buttons: &mut Vec<String>) {
     buttons.push(tr("open_menu"));
+    if let Some(message) = unavailable_message() {
+        buttons.push(message);
+    }
 }
 pub(super) fn settings_click(game: &mut dyn Host, button: usize) {
     if button != 0 {
@@ -786,7 +802,10 @@ pub(super) fn settings_click(game: &mut dyn Host, button: usize) {
 }
 pub(super) fn hud(game: &mut dyn Host, batch: &mut horizon_client::hud::HudBatch) {
     with_state(game, |game, state| {
-        if !on(game) || game.client_state().and_then(|v| v.server_address).is_none() {
+        if horizon_plasmo_engine::audio_runtime::unavailable_reason().is_some()
+            || !on(game)
+            || game.client_state().and_then(|v| v.server_address).is_none()
+        {
             return;
         }
         refresh_head_anchors(game, state);
@@ -1115,7 +1134,10 @@ const HEAD_ICON_GAP: f64 = 0.18;
 const NAME_ICON_GAP: f64 = 0.08;
 
 pub(super) fn foreground_hud(game: &dyn Host, batch: &mut horizon_client::hud::HudBatch) {
-    if !on(game) || game.client_state().and_then(|v| v.server_address).is_none() {
+    if horizon_plasmo_engine::audio_runtime::unavailable_reason().is_some()
+        || !on(game)
+        || game.client_state().and_then(|v| v.server_address).is_none()
+    {
         return;
     }
     with_read_state(game, |state| {
@@ -1289,6 +1311,25 @@ mod tests {
         fn mod_key(&self, _: &str, _: &str, default: &str) -> String {
             default.into()
         }
+    }
+
+    #[test]
+    fn disabled_build_explains_reason_without_registering_voice() {
+        let Some(message) = unavailable_message() else {
+            return;
+        };
+        let mut host = TestHost::default();
+        let mut state = State::new(&host);
+        assert!(!ensure(&mut host, &mut state));
+        assert!(state.client.is_none());
+        assert!(host.sent.is_empty());
+        assert_eq!(state.error, message);
+        let mut entries = Vec::new();
+        mods(&mut entries);
+        assert!(entries[0].description.contains(&message));
+        let mut buttons = Vec::new();
+        settings(&mut host, &mut buttons);
+        assert_eq!(buttons[1], message);
     }
 
     #[test]

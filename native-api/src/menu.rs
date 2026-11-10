@@ -798,6 +798,27 @@ pub(super) fn render(
     state.ui.tabs.update(g, width, height);
     let header_bottom = state.ui.tabs.content_top - 4.;
     fill(g, b, [0., 0., width, header_bottom], 0x66000000);
+    if let Some(message) = super::runtime::unavailable_message() {
+        text(g, b, &tr("settings_title"), 14., 16., WHITE);
+        let mut line = String::new();
+        let mut y = header_bottom + 18.;
+        for word in message.split_whitespace() {
+            let candidate = if line.is_empty() {
+                word.to_owned()
+            } else {
+                format!("{line} {word}")
+            };
+            if g.text_width(&candidate) > (width - 32.).max(32.) && !line.is_empty() {
+                text(g, b, &line, 16., y, WHITE);
+                y += 12.;
+                line = word.into();
+            } else {
+                line = candidate;
+            }
+        }
+        text(g, b, &line, 16., y, WHITE);
+        return;
+    }
     if let Some(hud) = state.ui.position {
         center(
             g,

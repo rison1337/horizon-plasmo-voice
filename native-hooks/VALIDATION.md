@@ -1,5 +1,40 @@
 # API adapter validation, 5 November 2026
 
+## 0.5.4 current Nightly packaging and disabled audio, 10 November 2026
+
+The catalog's current native-compat check rejected 0.5.3's separate installer
+crate: bundle crates may not depend on each other by path. Version 0.5.4 uses
+one declared `engine` crate containing protocol/audio code, build integration
+and the installer binary. The trait adapter points to that declared crate at
+its normal staged location; there are no path dependencies inside the bundle
+crate. All registry/build dependencies already exist in Horizon's Cargo.lock.
+The cmake and tar Rust crates are removed: original Rust build integration
+uses the already locked cc and sha2 crates and invokes local CMake directly.
+CMake extracts only the exact verified upstream archives, under OUT_DIR.
+
+The package is checked against public Nightly **2026-11-08**, core
+`fdc87aecdbd116bf1e08adcd062fcbaea8c2e2ca` and its Mixins tool
+`5a64af938ec86b00d53d16a408aabc0038fb3e57`. Registered API minimum 411 is
+retained. Application passes and all **522 registry package identities and
+checksums** remain unchanged. Both ordinary engine and opt-in DSP checks pass;
+codec/DSP loopback from the applied package passes without physical devices.
+The dedicated bundle checker additionally stages and checks the trait adapter
+with --locked, rather than relying only on ZIP structure validation.
+
+Unsupported targets (including macOS/MSVC), missing CMake/Ninja/compiler and
+failed audio compilation produce a generated disabled build result. The
+installer exits successfully for that result, records the disabled reason and
+keeps source/license files. The loader rejects all codecs, including stale
+installed libraries, and Client::start refuses to create a worker. The mod list,
+settings list and voice menu explain the cause in English or Russian. Install
+the missing tools and rebuild to enable voice. No voice network session or
+physical audio device is opened in this mode.
+
+The missing-CMake installer and disabled-worker regressions pass locally.
+CI covers ordinary Linux/Windows builds, Linux without CMake, macOS as an
+unsupported target, and real bundle application/trait checking on the exact
+Nightly. Each CI result is linked from the release after completion. Earlier
+live UI, Windows and five-server records below retain their original scope.
 
 ## 0.5.3 source-built audio dependencies, 7 November 2026
 

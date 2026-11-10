@@ -1,4 +1,4 @@
-# Source-built audio runtime
+# Voice engine and source-built audio runtime
 
 This crate compiles unmodified upstream C/C++ dependencies during Cargo's build.
 The native mod contains sources, never prebuilt audio libraries. It makes no
@@ -29,10 +29,18 @@ From the repository root:
 cargo test --workspace --locked
 cargo test --workspace --test hrtf --test denoise -- --ignored
 cargo run -p horizon-plasmo-engine --bin plasmo-voice-runtime -- --check
-python3 tools/check_source_bundle.py dist/plasmo-voice-0.5.3.hnmod
+python3 tools/check_source_bundle.py dist/plasmo-voice-0.5.4.hnmod
 ```
 
 The checks use synthetic audio and OpenAL loopback, without opening physical
 microphones or speakers. Runtime installation requires the launcher's
 HORIZON_NATIVE_DATA_DIR; it writes libraries, notices, complete corresponding
 source and a hash receipt, then verifies the installed APIs.
+
+The bundle declares this single crate. Its registry/build dependencies must
+already exist in Horizon’s Cargo.lock. No nested Cargo package, inter-crate
+path dependency, cmake crate or tar crate is included. The original build code
+uses cc for compiler selection and sha2 for integrity, then invokes local CMake.
+Missing tools, failed compilation and unsupported targets generate a disabled
+build result instead of panicking. A disabled client refuses codec loading and
+voice worker startup even if old installed libraries are present.

@@ -1,4 +1,4 @@
-# Plasmo Voice 0.5.3: Hooks / Host
+# Plasmo Voice 0.5.4: Hooks / Host
 
 `native-api/` is the complete public-API adapter for the existing Rust voice
 engine. Its entry point is `hooks() -> Box<dyn Hooks>`; the ordinary `.hnmod`
@@ -23,12 +23,12 @@ changes this setting nor mutates its process environment.
 Horizon [PR #9812](https://github.com/horizon-rust/horizon/pull/9812) registers
 the foreground GUI extension as API 410 and the client Host services as API 411.
 The release declares **`hooks: 411`** and records tested public commit
-`d52ff7a6f783a164043549f5f04645d5324d0d8a`. The launcher's ordinary native build
+`fdc87aecdbd116bf1e08adcd062fcbaea8c2e2ca`. The launcher's ordinary native build
 can use compatible newer Nightlies; no private source cache is required.
 
 ## Installation
 
-Put `plasmo-voice-0.5.3.hnmod` from the GitHub Release
+Put `plasmo-voice-0.5.4.hnmod` from the GitHub Release
 in the selected instance's
 `horizon-native-mods/`. Enable `plasmo_voice` on the Mods page, select
 **Performance**, Build, then Play. For a 1.21.11 server, also set the environment
@@ -41,7 +41,8 @@ is included. The Rust post-build installer installs and verifies those local
 outputs, notices and source archives. No manual DLL copy or library-path setting
 is needed. Linux requires C/C++ compilers, CMake, pkg-config and ALSA/libudev
 headers. Windows GNU requires MinGW-w64, CMake and Ninja on PATH; the launcher
-provides its Rust/MinGW toolchain. Windows MSVC and macOS are not validated.
+provides its Rust/MinGW toolchain. Unsupported targets (including macOS/MSVC) and missing build tools disable
+voice without aborting the game build. The mod list and settings explain why.
 
 ## Preserved functionality
 
@@ -78,7 +79,7 @@ Build the release against the public registered API (no core patch):
 python3 tools/package_native_api.py --source /path/to/registered/horizon
 ```
 
-This creates `dist/plasmo-voice-0.5.3.hnmod`. To reproduce its core revision:
+This creates `dist/plasmo-voice-0.5.4.hnmod`. To reproduce its core revision:
 
 ```sh
 python3 tools/prepare_native_api.py --horizon /path/to/horizon \

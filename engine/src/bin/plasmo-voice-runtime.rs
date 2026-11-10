@@ -1,6 +1,6 @@
 //! Launcher post-build step. Installs this Cargo build's source-built libraries.
+use horizon_plasmo_engine::audio_runtime::{LIBRARIES, LICENSES, SOURCE_ARCHIVES, SOURCE_MANIFEST};
 use horizon_plasmo_engine::{Result, denoise::Denoiser, hrtf::Hrtf, libraries, opus::Opus};
-use horizon_plasmo_runtime::{LIBRARIES, LICENSES, SOURCE_ARCHIVES, SOURCE_MANIFEST};
 use sha2::{Digest, Sha256};
 use std::{env, fs, path::PathBuf};
 
@@ -22,9 +22,21 @@ fn verify() -> Result<()> {
     Ok(())
 }
 fn run() -> Result<()> {
+    let disabled = horizon_plasmo_engine::audio_runtime::unavailable_reason();
+    let args: Vec<_> = env::args().collect();
+    if let Some(at) = args.iter().position(|a| a == "--expect-disabled") {
+        if args.get(at + 1).map(String::as_str) != disabled || disabled.is_none() {
+            return Err(format!("unexpected disabled reason: {disabled:?}"));
+        }
+        println!("Plasmo Voice: disabled as expected ({})", disabled.unwrap());
+        return Ok(());
+    }
     if env::args().any(|arg| arg == "--check") {
+        if let Some(reason) = disabled {
+            return Err(format!("voice disabled: {reason}"));
+        }
         // Deliberately bypass older installed binaries for a source-build test.
-        libraries::set_directory(horizon_plasmo_runtime::built_directory().into())?;
+        libraries::set_directory(horizon_plasmo_engine::audio_runtime::built_directory().into())?;
         verify()?;
         println!(
             "Plasmo Voice: source-built Opus, RNNoise and HRTF pass without physical devices."
@@ -52,19 +64,26 @@ fn run() -> Result<()> {
         }
     }
     fs::write(to.join("sources.json"), SOURCE_MANIFEST).map_err(|e| e.to_string())?;
-    libraries::set_directory(to.join("lib"))?;
-    verify()?;
+    if disabled.is_none() {
+        libraries::set_directory(to.join("lib"))?;
+        verify()?;
+    }
     fs::write(
         to.join("runtime-installed.json"),
         serde_json::json!({
             "schema":2,"target":format!("{}-{}",env::consts::OS,env::consts::ARCH),
-            "built_from_source":true,"files":installed,
-            "opus":true,"rnnoise":true,"hrtf_loopback":true,
+            "built_from_source":disabled.is_none(),"files":installed,
+            "disabled_reason":disabled,
+            "opus":disabled.is_none(),"rnnoise":disabled.is_none(),"hrtf_loopback":disabled.is_none(),
         })
         .to_string(),
     )
     .map_err(|e| e.to_string())?;
-    println!("Plasmo Voice: installed and verified source-built Opus, RNNoise and HRTF.");
+    if let Some(reason) = disabled {
+        println!("Plasmo Voice disabled: {reason}. The game and other mods can still run.");
+    } else {
+        println!("Plasmo Voice: installed and verified source-built Opus, RNNoise and HRTF.");
+    }
     Ok(())
 }
 fn main() {

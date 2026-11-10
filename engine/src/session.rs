@@ -380,6 +380,9 @@ impl Client {
         settings: Settings,
         devices: bool,
     ) -> Result<Self> {
+        if let Some(reason) = crate::audio_runtime::unavailable_reason() {
+            return Err(format!("Plasmo Voice disabled: {reason}"));
+        }
         let (tx, commands) = mpsc::sync_channel(128);
         let (events, rx) = mpsc::sync_channel(128);
         let talking = Arc::new(AtomicBool::new(false));

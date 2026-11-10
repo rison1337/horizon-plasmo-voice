@@ -15,8 +15,8 @@ import tempfile
 import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
-MIXINS = "e8cd0aa38cffef49cb2e088ef716baa107148c02"
-VERSION = "0.5.3"
+MIXINS = "5a64af938ec86b00d53d16a408aabc0038fb3e57"
+VERSION = "0.5.4"
 REQUIRED_HOOKS = {"gui_render_post", "client_disconnecting", "client_stopping", "menu_background"}
 REQUIRED_HELPERS = {"client_state", "client_entities", "client_heads", "client_profiles",
                     "client_visual_clear", "client_block_obstruction", "gui_paint",
@@ -37,11 +37,11 @@ horizon_revision = "{revision}"
 path = "api"
 
 [[crate]]
-id = "runtime_installer"
-path = "runtime-installer"
+id = "engine"
+path = "engine"
 
 [[post_build]]
-crate = "runtime_installer"
+crate = "engine"
 bin = "plasmo-voice-runtime"
 ''')
     api = destination / "api"
@@ -49,29 +49,15 @@ bin = "plasmo-voice-runtime"
         shutil.copytree(ROOT / "native-api" / name, api / name)
     manifest = (ROOT / "native-api/Cargo.toml").read_text()
     manifest = manifest.replace("../../horizon/crates/", "../../crates/")
-    manifest = manifest.replace('path = "../engine"', 'path = "engine"')
+    manifest = manifest.replace('path = "../engine"', 'path = "../../native-crates/plasmo_voice/engine"')
     (api / "Cargo.toml").write_text(manifest)
-    shutil.copytree(ROOT / "engine/src", api / "engine/src")
-    (api / "engine/Cargo.toml").write_text((ROOT / "engine/Cargo.toml").read_text().replace(
-        'path = "../runtime"', 'path = "../../runtime"'))
-    shutil.copytree(ROOT / "runtime", destination / "runtime",
-                    ignore=shutil.ignore_patterns("target", "__pycache__"))
-    # The installer depends only on the standalone engine/runtime, never the
-    # adapter (which depends on the game). Sources are packaged exactly once.
-    installer = destination / "runtime-installer"
-    (installer / "src/bin").mkdir(parents=True)
-    shutil.copyfile(ROOT / "engine/src/bin/plasmo-voice-runtime.rs", installer / "src/bin/plasmo-voice-runtime.rs")
-    (installer / "Cargo.toml").write_text('''[package]
-name = "horizon-plasmo-runtime-installer"
-version = "0.1.0"
-edition = "2024"
-license = "MIT"
-[dependencies]
-horizon-plasmo-engine = { path = "../api/engine" }
-horizon-plasmo-runtime = { path = "../runtime" }
-serde_json = "1"
-sha2 = "0.10.9"
-''')
+    # One declared standalone crate owns the engine, source build and installer.
+    # Its dependencies are registry requirements from Horizon's existing lock.
+    engine = destination / "engine"
+    for name in ["src", "data"]:
+        shutil.copytree(ROOT / "engine" / name, engine / name)
+    for name in ["Cargo.toml", "build.rs", "README.md"]:
+        shutil.copyfile(ROOT / "engine" / name, engine / name)
     shutil.copytree(ROOT / "data", destination / "data")
     shutil.copyfile(ROOT / "LICENSE", destination / "LICENSE")
     shutil.copyfile(ROOT / "THIRD_PARTY_NOTICES.md", destination / "NOTICE.md")
@@ -118,7 +104,7 @@ def main():
         if not level:
             parser.error("source has no numeric API level")
         if args.hooks is None:
-            args.hooks = int(level[1])
+            args.hooks = 411
         if args.hooks < 409:
             parser.error("minimum API predates send_packet")
         # A release must use the stamped catalog, never pending fragments.
@@ -126,8 +112,8 @@ def main():
             parser.error("required hooks await official stamping; --pinned is a development check only")
         if REQUIRED_HELPERS - helpers:
             parser.error("required Host services are not in the accepted catalog")
-        if args.hooks != int(level[1]):
-            parser.error("use the accepted source's actual API level as the tested minimum")
+        if not 411 <= args.hooks <= int(level[1]):
+            parser.error("minimum must include registered API 411 and be supported by the tested source")
     else:
         for fragment in fragments.glob("*.json"):
             pending = json.loads(fragment.read_text())

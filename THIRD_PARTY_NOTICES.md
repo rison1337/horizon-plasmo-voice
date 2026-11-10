@@ -38,10 +38,10 @@ Additional interoperability and behavior references (no implementation copied):
   https://openal-soft.org/openal-extensions/SOFT_loopback.txt
   https://openal-soft.org/openal-extensions/SOFT_HRTF.txt
   https://openal-soft.org/openal-extensions/EXT_thread_local_context.txt
-Version 0.5.3 builds its audio dependencies from complete unmodified source
+Version 0.5.4 builds its audio dependencies from complete unmodified source
 archives during Cargo compilation. No precompiled .so/.dll or executable is
 included in the native mod package. Source URLs, versions, licences and verified
-SHA-256 values are in runtime/data/sources.json:
+SHA-256 values are in engine/data/sources.json:
 
 - Opus 1.6.1: BSD-3-Clause; COPYING in its release archive.
 - RNNoise 0.2: BSD-3-Clause; COPYING in its release archive.
@@ -59,7 +59,7 @@ the post-build installer copies the three upstream COPYING files to licenses/.
 UI icons remain original code-drawn primitives.
 
 Earlier 0.5.0-0.5.2 releases carried prebuilt libraries and their notices. Those
-immutable historical releases remain unchanged; this notice describes 0.5.3.
+immutable historical releases remain unchanged; this notice describes 0.5.4.
 
 Historical attribution (local 0.4.x only; not included in the 0.5.0 API adapter):
 Item component compatibility was adapted from Horizon PR #8659,

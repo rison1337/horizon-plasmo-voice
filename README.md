@@ -19,7 +19,7 @@ players from Horizon, with positional sound, push to talk, and a familiar voice
 settings menu. This is a native **`.hnmod`**, built into the client by Horizon
 Launcher. It is written in Rust, not a Fabric or NeoForge JAR.
 
-> **0.5.3 · Horizon native API 411 or newer**
+> **0.5.4 · Horizon native API 411 or newer**
 > The Hooks/Host integration uses officially registered Horizon APIs. Download
 > the `.hnmod` from [Releases](https://github.com/rison1337/horizon-plasmo-voice/releases).
 > One source package builds its audio dependencies on Linux x86_64 and Windows x64.
@@ -62,7 +62,9 @@ Put the `.hnmod` into your instance's `horizon-native-mods/`, enable
 `plasmo_voice` on the launcher's **Mods** page, select **Performance**, and
 **Build**. Then start the instance with **Play**. The post-build step installs
 and verifies the libraries compiled from source for the current operating system.
-Building requires C/C++ compilers and CMake; see the platform requirements below.
+Voice requires C/C++ compilers and CMake (Windows GNU also needs Ninja). If those
+tools are unavailable, or on unsupported platforms such as macOS, the mod still
+builds with voice disabled and shows the reason in its settings.
 
 Use a Nightly with native API **411 or newer**. The release records the tested
 public source commit; compatible newer Nightlies can build it too.
@@ -95,7 +97,7 @@ checks. An explicit horn instrument still fails in Horizon's two tested 1.21.x
 adapters; see the [matrix and upstream fix](docs/SERVER_COMPATIBILITY.md).
 Earlier checks cover PTT on eight screens, player volume, English UI, camera
 alignment, helmet/crouch clearance, and block-shape visibility.
-The engine has **23 regular tests**, two additional DSP checks, and the
+The engine has **24 regular tests**, two additional DSP checks, and the
 adapter has **6 regression tests**. [Linux and Windows CI pass](https://github.com/rison1337/horizon-plasmo-voice/actions/runs/42374283485),
 including source-built codec/DSP tests and Linux QEMU without AVX. Windows GUI
 and physical audio-device testing is still outstanding.
@@ -109,7 +111,7 @@ limits. Pixel-for-pixel UI or bit-identical audio processing is not claimed.
 | --- | --- |
 | `native-api/` | Hooks/Host adapter, settings UI, original in-game pixel icons |
 | `engine/` | Protocol, UDP/AES/Opus, device I/O, audio processing and spatial sound |
-| `runtime/` | Verified upstream source archives, CMake/Cargo build rules, install payload |
+| `engine/data/` | Verified upstream source archives, CMake/Cargo build rules, install payload |
 | `tools/` | Development staging, packaging, and branding exports |
 | `assets/` | Shared launcher/README icon and GitHub social preview artwork |
 | `publishing/` | Catalog entry and icon submitted for review |

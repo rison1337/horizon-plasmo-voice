@@ -132,5 +132,11 @@
   "voice_distance": "Voice distance",
   "occlusion_hotkeys": "Sound occlusion",
   "left_shift": "Left Shift",
-  "left_control": "Left Control"
+  "left_control": "Left Control",
+  "runtime_unsupported_target": "Voice is disabled on this platform. This version supports Linux x86_64 GNU and Windows x64 GNU. The game and other mods remain available.",
+  "runtime_missing_cmake": "Voice is disabled because CMake was not found during the build. Install CMake on PATH and rebuild the instance.",
+  "runtime_missing_ninja": "Voice is disabled because Ninja was not found during the build. Install Ninja on PATH and rebuild the instance.",
+  "runtime_missing_compiler": "Voice is disabled because a C/C++ compiler is unavailable. Install the build tools and rebuild the instance.",
+  "runtime_build_failed": "Voice is disabled because its audio libraries could not be built. See the build log, fix the build tools and rebuild the instance.",
+  "runtime_source_integrity": "Voice is disabled because an audio source archive failed its integrity check. Download the mod again and rebuild the instance."
 }

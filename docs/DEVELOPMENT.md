@@ -19,10 +19,10 @@ No system Opus, RNNoise or OpenAL install or library-path override is required.
 
 ### Reviewable native dependencies
 
-`runtime/build.rs` verifies the SHA-256 of the three immutable upstream source
-archives in `runtime/data/sources/`, extracts them into Cargo's `OUT_DIR`, and
+`engine/build.rs` verifies the SHA-256 of the three immutable upstream source
+archives in `engine/data/sources/`, extracts them into Cargo's `OUT_DIR`, and
 runs CMake to compile shared libraries for the target. Its build does not fetch
-anything from the network. `runtime/data/sources.json` lists original URLs,
+anything from the network. `engine/data/sources.json` lists original URLs,
 versions, licences and archive hashes. The unmodified source archives are the
 reviewable payload; no `.so`, `.dll`, object or executable is bundled.
 
@@ -43,7 +43,7 @@ Source builds use the player's local C/C++ ABI, rather than distributing a
 precompiled library tied to the developer's GLIBC. Linux needs the headers
 above. Windows x64 GNU needs MinGW-w64 C/C++ and CMake and Ninja on PATH (the launcher
 provides its Rust/MinGW toolchain; install CMake and Ninja if absent). Windows MSVC and
-macOS are not validated targets. CI checks baseline CPU codec/DSP loopback.
+macOS build a disabled voice client instead of failing the game build. CI checks baseline CPU codec/DSP loopback.
 
 ## Hooks/Host adapter
 
@@ -53,7 +53,7 @@ worktree. The explicit revision below reproduces the accepted-source check:
 ```sh
 git clone --filter=blob:none https://github.com/horizon-rust/horizon ../horizon
 python3 tools/prepare_native_api.py --horizon ../horizon \
-  --revision ffd9ffb99554fc64433ca8a9258cf7a8ec1d5c2f
+  --revision fdc87aecdbd116bf1e08adcd062fcbaea8c2e2ca
 cargo test --manifest-path .local/native-api-accepted/Cargo.toml \
   -p horizon-plasmo-native --lib
 cargo clippy --manifest-path .local/native-api-accepted/Cargo.toml \
@@ -75,17 +75,17 @@ API level you have tested:
 python3 tools/package_native_api.py --source /path/to/registered/horizon
 ```
 
-The output is `dist/plasmo-voice-0.5.3.hnmod`. To reproduce the release's core
+The output is `dist/plasmo-voice-0.5.4.hnmod`. To reproduce the release's core
 revision, stage it explicitly:
 
 ```sh
 python3 tools/prepare_native_api.py --horizon ../horizon \
-  --revision d52ff7a6f783a164043549f5f04645d5324d0d8a --out .local/native-api-release
+  --revision fdc87aecdbd116bf1e08adcd062fcbaea8c2e2ca --out .local/native-api-release
 python3 tools/package_native_api.py --source .local/native-api-release
 ```
 
-The tool reads the actual committed API level and creates the portable package;
-it refuses to guess a number. Package output and SHA-256 are printed as JSON.
+The tool checks the committed API catalog and retains the actual required minimum
+411 when testing a newer Nightly. Package output and SHA-256 are printed as JSON.
 The registry's final file check is `cargo horizon-mod check <file.hnmod>`.
 The explicit `--pinned` option remains available for development-only checks on
 older source whose required APIs are still pending; it is not a release mode.
@@ -94,6 +94,31 @@ For playing, let the official launcher build in **Performance** mode. Keep live
 tests isolated from real game data; prepare resources from your own Minecraft
 copy. Do not commit or print account/session files. Device tests should use
 explicitly configured virtual devices unless a human has chosen a physical test.
+
+## Bundle compatibility regression
+
+Use the exact Nightly's cargo-horizon-mod and horizon-mixins executables:
+
+```sh
+python3 tools/check_native_bundle.py --source /path/to/public/horizon \
+  --mixins /path/to/horizon-mixins --mod-tool /path/to/cargo-horizon-mod \
+  --work .local/bundle-check
+```
+
+This checks the packaged artifact, applies its declared crate, compares all
+registry package versions/sources/checksums, stages the trait adapter at the
+launcher's paths, checks it with --locked and runs installed codec/DSP APIs.
+It does not start a game or access real player data. CI repeats this on the
+release's exact public Nightly. The single engine crate's dependencies must
+remain in that Nightly's lock; never update the core lock to make it pass.
+
+To check the unavailable-tool path explicitly:
+
+```sh
+CMAKE=/missing/plasmo-cmake cargo test --locked -p horizon-plasmo-engine --test unavailable
+CMAKE=/missing/plasmo-cmake cargo run --locked -p horizon-plasmo-engine \
+  --bin plasmo-voice-runtime -- --expect-disabled missing_cmake
+```
 
 ## Brand assets
 

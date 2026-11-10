@@ -1,5 +1,18 @@
 # Changelog
 
+
+## 0.5.4 — 2026-11-10
+
+- Combines engine, source build and installer in one declared bundle crate,
+  removing all path dependencies between standalone bundle crates.
+- Uses only dependencies already locked by current Horizon; removes cmake/tar
+  Rust dependencies and invokes local CMake after source SHA-256 verification.
+- Missing tools, unsupported platforms and failed native compilation disable
+  voice with a translated explanation instead of failing the whole game build.
+- Prevents disabled builds from loading stale libraries or creating voice workers.
+- Adds exact-Nightly package application/lock/trait checks and Linux missing-CMake
+  and macOS disabled-build CI coverage. Retains all voice and input behavior.
+
 ## 0.5.3 — 2026-11-07
 
 - Replaces all six prebuilt Linux/Windows audio libraries with complete upstream

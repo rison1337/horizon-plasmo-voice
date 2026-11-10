@@ -1,4 +1,5 @@
 pub mod audio;
+pub mod audio_runtime;
 pub mod crypto;
 pub mod denoise;
 pub mod hrtf;

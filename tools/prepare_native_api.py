@@ -41,13 +41,13 @@ for name in ['src','data']:
 manifest=(ROOT/'native-api/Cargo.toml').read_text()
 manifest=manifest.replace('../../horizon/crates/horizon-client','../../crates/horizon-client')
 manifest=manifest.replace('../../horizon/crates/horizon-protocol','../../crates/horizon-protocol')
-manifest=manifest.replace('path = "../engine"','path = "engine"')
+manifest=manifest.replace('path = "../engine"','path = "../../native-crates/plasmo_voice/engine"')
 (api/'Cargo.toml').write_text(manifest)
-shutil.copytree(ROOT/'engine/src',api/'engine/src',dirs_exist_ok=True)
-(api/'engine/Cargo.toml').write_text((ROOT/'engine/Cargo.toml').read_text().replace(
-    'path = "../runtime"', 'path = "../../plasmo_runtime"'))
-shutil.copytree(ROOT/'runtime',out/'native-api/plasmo_runtime',dirs_exist_ok=True,
-                ignore=shutil.ignore_patterns('target', '__pycache__'))
+engine=out/'native-crates/plasmo_voice/engine'
+for name in ['src','data']:
+    shutil.copytree(ROOT/'engine'/name,engine/name,dirs_exist_ok=True)
+for name in ['Cargo.toml','build.rs','README.md']:
+    shutil.copyfile(ROOT/'engine'/name,engine/name)
 wrapper=out/'crates/plasmo-native-preview';(wrapper/'src').mkdir(parents=True,exist_ok=True)
 (wrapper/'Cargo.toml').write_text('''[package]
 name = "plasmo-native-preview"
@@ -59,7 +59,7 @@ horizon-threads = {path="../horizon-threads"}
 horizon-mods = {path="../horizon-mods",default-features=false}
 horizon-plasmo-native = {path="../../native-api/plasmo_voice"}
 [[bin]]
-name = "horizon-client"
+name = "plasmo-native-preview"
 path = "src/main.rs"
 ''')
 (wrapper/'src/main.rs').write_text('''#[global_allocator]
@@ -74,7 +74,7 @@ fn main() {
 # Translations; source-built libraries are installed by the normal post-build step.
 shutil.copytree(ROOT/'data',out/'native-data/plasmo_voice',dirs_exist_ok=True)
 cargo=out/'Cargo.toml';text=cargo.read_text()
-for member in ['native-api/plasmo_voice','native-api/plasmo_runtime','crates/plasmo-native-preview']:
+for member in ['native-api/plasmo_voice','native-crates/plasmo_voice/engine','crates/plasmo-native-preview']:
     if '"'+member+'"' not in text:text=text.replace('members = [','members = [\n    "'+member+'",',1)
 cargo.write_text(text)
 print(out)

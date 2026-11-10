@@ -1,0 +1,30 @@
+{
+  "version": "0.5.4",
+  "date": "2026-11-10",
+  "horizon": "fdc87aecdbd116bf1e08adcd062fcbaea8c2e2ca",
+  "mixins": "5a64af938ec86b00d53d16a408aabc0038fb3e57",
+  "hooks": 411,
+  "bundle": {
+    "declared_crates": 1,
+    "inter_crate_path_dependencies": 0,
+    "new_registry_packages": 0,
+    "locked_registry_packages_preserved": 522,
+    "prebuilt_executable_payloads": 0,
+    "source_archives_unchanged_from": "0.5.3"
+  },
+  "local": {
+    "engine_tests": 24,
+    "opt_in_dsp_tests": 2,
+    "previous_adapter_regressions": 6,
+    "missing_cmake_disabled_build": "pass",
+    "disabled_codec_and_worker_guard": "pass",
+    "failed_cmake_command_disabled_build_and_install": "pass",
+    "missing_cmake_install_and_recovery_without_clean_or_env_change": "pass"
+  },
+  "ci": "Linked in release notes once completed; includes Linux, Windows, unsupported macOS, exact Nightly bundle application and trait checking.",
+  "limits": [
+    "No physical microphone/speaker or Windows GUI testing.",
+    "No additional five-server voice/version matrix.",
+    "macOS voice is intentionally disabled; only build/install behavior is tested."
+  ]
+}

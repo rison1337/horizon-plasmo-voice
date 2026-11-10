@@ -27,6 +27,9 @@ pub fn directory() -> Option<PathBuf> {
 /// The caller must use the loaded symbols with the library's published ABI.
 /// A present bundled library that cannot load is reported, never silently replaced.
 pub(crate) unsafe fn load(names: &[&str]) -> Result<Library> {
+    if let Some(reason) = crate::audio_runtime::unavailable_reason() {
+        return Err(format!("Plasmo Voice disabled: {reason}"));
+    }
     if let Some(dir) = directory() {
         for name in names {
             let path = dir.join(name);
@@ -40,7 +43,7 @@ pub(crate) unsafe fn load(names: &[&str]) -> Result<Library> {
     // Tests and development use only this Cargo build's verified source output.
     // Never silently pick a system codec or an unrelated DLL from PATH.
     for name in names {
-        let path = horizon_plasmo_runtime::built_directory().join(name);
+        let path = crate::audio_runtime::built_directory().join(name);
         if path.is_file() {
             return unsafe { Library::new(&path) }.map_err(|e| format!("{}: {e}", path.display()));
         }

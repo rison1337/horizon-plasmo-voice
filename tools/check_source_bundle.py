@@ -32,10 +32,11 @@ def inspect(path):
         for name in names:
             if executable(name, archive.read(name)[:8]):
                 raise ValueError(f'prebuilt executable payload: {name}')
-        manifest = json.loads(archive.read(prefix + 'runtime/data/sources.json'))
+        folder = 'engine' if prefix + 'engine/data/sources.json' in names else 'runtime'
+        manifest = json.loads(archive.read(prefix + folder + '/data/sources.json'))
         sources = []
         for source in manifest['sources']:
-            filename = prefix + 'runtime/data/sources/' + source['archive']
+            filename = prefix + folder + '/data/sources/' + source['archive']
             data = archive.read(filename)
             digest = hashlib.sha256(data).hexdigest()
             if digest != source['sha256']:

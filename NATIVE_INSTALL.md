@@ -2,12 +2,12 @@
 
 ## Current status
 
-Download `plasmo-voice-0.5.3.hnmod` from
-[Releases](https://github.com/rison1337/horizon-plasmo-voice/releases/tag/v0.5.3).
+Download `plasmo-voice-0.5.4.hnmod` from
+[Releases](https://github.com/rison1337/horizon-plasmo-voice/releases/tag/v0.5.4).
 Use a Horizon Nightly with native API **411 or newer**. Both required extensions
 are officially registered by [Horizon PR #9812](https://github.com/horizon-rust/horizon/pull/9812).
 The release records the tested public Horizon commit
-`d52ff7a6f783a164043549f5f04645d5324d0d8a` and declares `hooks: 411`, so it can
+`fdc87aecdbd116bf1e08adcd062fcbaea8c2e2ca` and declares `hooks: 411`, so it can
 also build on compatible later Nightlies.
 
 See [Development](docs/DEVELOPMENT.md) to build the package yourself.
@@ -28,6 +28,11 @@ Opus, RNNoise and OpenAL Soft, and the Rust post-build step installs the local
 compiler outputs and verifies codec/DSP APIs. C/C++ compilers and CMake must be
 available. On Debian/Ubuntu install `build-essential cmake pkg-config libasound2-dev
 libudev-dev`; on Windows GNU use the launcher's MinGW toolchain with CMake and Ninja on PATH.
+
+If CMake/Ninja or a C/C++ compiler is missing, or the target is unsupported
+(including macOS), voice is disabled for that build. The game and other mods
+still build. The mod list and voice settings explain the cause in English or
+Russian. Install the missing tools and rebuild to enable voice.
 
 ## Server versions
 

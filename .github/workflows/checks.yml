@@ -115,3 +115,4 @@ jobs:
             Write-Output $_.FullName
             Get-Content $_.FullName | Select-String -Pattern 'error:|fatal:|FAILED:|CMake Error|undefined reference|cannot find|not found|ninja:|windres:'
           }
+          Get-ChildItem target -Recurse -Filter *.dll | Select-Object -ExpandProperty FullName

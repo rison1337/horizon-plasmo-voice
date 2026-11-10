@@ -175,24 +175,54 @@ fn build(root: &Path, out: &Path, target: &str) -> Result<Vec<&'static str>> {
             .args(["--target", "install"]),
         out,
     )?;
-    let outputs = if target.ends_with("windows-gnu") {
+    let outputs: Vec<(&str, &[&str], &str)> = if target.ends_with("windows-gnu") {
         vec![
-            ("bin", "libopus-0.dll", "libopus-0.dll"),
-            ("bin", "librnnoise.dll", "librnnoise-0.dll"),
-            ("bin", "soft_oal.dll", "soft_oal.dll"),
+            (
+                "bin",
+                &["libopus-0.dll", "opus.dll", "libopus.dll"],
+                "libopus-0.dll",
+            ),
+            (
+                "bin",
+                &["librnnoise.dll", "rnnoise.dll"],
+                "librnnoise-0.dll",
+            ),
+            (
+                "bin",
+                &["soft_oal.dll", "OpenAL32.dll", "libopenal.dll"],
+                "soft_oal.dll",
+            ),
         ]
     } else {
         vec![
-            ("lib", "libopus.so.0", "libopus.so.0"),
-            ("lib", "librnnoise.so.0", "librnnoise.so.0"),
-            ("lib", "libopenal.so.1", "libopenal.so.1"),
+            ("lib", &["libopus.so.0", "libopus.so"], "libopus.so.0"),
+            (
+                "lib",
+                &["librnnoise.so.0", "librnnoise.so"],
+                "librnnoise.so.0",
+            ),
+            ("lib", &["libopenal.so.1", "libopenal.so"], "libopenal.so.1"),
         ]
     };
     let runtime = out.join("runtime");
     fs::create_dir_all(&runtime).map_err(io)?;
     let mut names = Vec::new();
-    for (folder, source, name) in outputs {
-        let bytes = fs::read(install.join(folder).join(source)).map_err(io)?;
+    for (folder, candidates, name) in outputs {
+        let directory = install.join(folder);
+        let source = candidates
+            .iter()
+            .map(|candidate| directory.join(candidate))
+            .find(|path| path.is_file())
+            .ok_or_else(|| {
+                Unavailable(
+                    "build_failed",
+                    format!(
+                        "compiler did not produce {name}; checked {candidates:?} in {}",
+                        directory.display()
+                    ),
+                )
+            })?;
+        let bytes = fs::read(source).map_err(io)?;
         if !(bytes.starts_with(b"\x7fELF") || bytes.starts_with(b"MZ")) {
             return Err(Unavailable(
                 "build_failed",

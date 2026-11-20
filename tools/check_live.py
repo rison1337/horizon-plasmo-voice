@@ -7,6 +7,8 @@ changes the system default route. Paper must grant these test players /tp and
 /fill permission. Images and JSON are evidence, never a pass inferred from source.
 """
 import argparse
+import ctypes
+import os
 import json
 import math
 from pathlib import Path
@@ -24,8 +26,25 @@ def main():
     p.add_argument('--input-a', default='pv_sdk_in_a')
     p.add_argument('--output-b', default='pv_sdk_out_b.monitor')
     p.add_argument('--tone', type=Path, required=True)
+    p.add_argument('--display-b', required=True, help='isolated Xwayland display of B, never the desktop')
     args = p.parse_args()
     assert args.input_a.startswith('pv_sdk_') and args.output_b.startswith('pv_sdk_')
+    assert args.display_b.startswith(':') and args.display_b != os.environ.get('DISPLAY')
+    x11 = ctypes.CDLL('libX11.so.6')
+    xtest = ctypes.CDLL('libXtst.so.6')
+    x11.XOpenDisplay.argtypes = [ctypes.c_char_p]
+    x11.XOpenDisplay.restype = ctypes.c_void_p
+    x11.XFlush.argtypes = [ctypes.c_void_p]
+    xtest.XTestFakeButtonEvent.argtypes = [ctypes.c_void_p, ctypes.c_uint, ctypes.c_int, ctypes.c_ulong]
+    display = x11.XOpenDisplay(args.display_b.encode())
+    assert display, 'isolated display unavailable'
+
+    def right_button(pressed):
+        # Horizon intentionally skips raw-button hooks for control-socket
+        # synthetic clicks. XTest on the isolated display exercises real input.
+        xtest.XTestFakeButtonEvent(display, 3, int(pressed), 0)
+        x11.XFlush(display)
+        time.sleep(0.1)
     args.out.mkdir(parents=True, exist_ok=True)
     folders = [args.a.resolve(), args.b.resolve()]
     results = {}
@@ -136,15 +155,16 @@ def main():
         # The remote-player handle, picking and persistence all participate.
         target = ctl(0, 'state')['player']['position']
         ctl(1, 'look-at', target[0], target[1] + 1.3, target[2])
-        ctl(1, 'mouse', 'right', 'down')
+        before_volumes = settings(1)['player_volumes'] if (folders[1] / 'config/plasmo_voice/settings.json').exists() else {}
+        right_button(True)
         ctl(1, 'key', 'shift', 'down')
         ctl(1, 'scroll-at', 240, 135, 1)
         time.sleep(0.2)
         ctl(1, 'key', 'shift', 'up')
-        ctl(1, 'mouse', 'right', 'up')
+        right_button(False)
         frame(1, 'player-volume-changed')
         volumes = settings(1)['player_volumes']
-        assert any(abs(v - 1.05) < 1e-4 for v in volumes.values()), volumes
+        assert any(abs(v - before_volumes.get(k, 1.) - 0.05) < 1e-4 for k, v in volumes.items()), volumes
         results['shift_action_wheel'] = volumes
 
         # Test wall construction on this throwaway world only; retain frames
@@ -160,6 +180,7 @@ def main():
         results['wall_frames_recorded'] = True
     finally:
         ctl(0, 'key', 'key.keyboard.left.alt', 'up')
+        right_button(False)
         input_process.terminate()
         input_process.wait(timeout=5)
         (args.out / 'report.json').write_text(json.dumps(results, indent=2) + '\n')

@@ -535,7 +535,8 @@ pub(crate) fn player_icon(host: &dyn ClientHost, event: &mut mod_api::RenderPlay
     ]
     .map(|p| p.to_array());
     let light = event.draw.light();
-    event.draw.set_light(0x00f000f0);
+    // SDK draw light packs 16*sky into bits 0..8 and 16*block into 8..16.
+    event.draw.set_light(0x0000f0f0);
     event
         .draw
         .quad(&texture, corners, [0., 0., 16., 16.], 0xffffff);

@@ -1,0 +1,47 @@
+{
+  "tabs": {
+    "devices": 21,
+    "volume": 18,
+    "activation": 14,
+    "overlay": 18,
+    "advanced": 20,
+    "hotkeys": 18
+  },
+  "key_capture_save_reset": true,
+  "setting_save": true,
+  "ptt_over_interfaces": {
+    "voice_menu": {
+      "packets": 57,
+      "microphone_open": true
+    },
+    "pause": {
+      "packets": 35,
+      "microphone_open": true
+    },
+    "options": {
+      "packets": 45,
+      "microphone_open": true
+    },
+    "inventory": {
+      "packets": 55,
+      "microphone_open": true
+    },
+    "playing": {
+      "packets": 37,
+      "microphone_open": true
+    }
+  },
+  "real_output": {
+    "samples": 284160,
+    "rms_s16": 1258.7854823250814,
+    "receiver": {
+      "received": 1015,
+      "output_level": 0.038752470165491104,
+      "error": ""
+    }
+  },
+  "shift_action_wheel": {
+    "316763909175536872058479434039989654137": 1.1
+  },
+  "wall_frames_recorded": true
+}

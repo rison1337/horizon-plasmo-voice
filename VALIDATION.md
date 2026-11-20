@@ -48,12 +48,48 @@ at 1280×720 without interfering with the user's desktop. The
 text and controls are visible. The new renderer's ARGB requirement exposed
 transparent legacy RGB text; the UI bridge now converts opaque RGB appropriately.
 
-CI is recorded separately by the commit's Actions checks. Source-API tests do not
-prove SDK ABI compatibility; the launcher build above supplies that evidence.
-The five-version server matrix below belongs to 0.5.0. A new live two-player voice
-session, physical microphones/speakers, other-mod combinations and Windows GUI
-are **not** claimed for 0.6.0. Windows audio source/DSP/null-output checks and
-unsupported macOS behavior are covered by the source workflow when green.
+### Live regression with actual Plasmo Voice
+
+Two isolated SDK clients join local **Paper 1.21.11 build 132**, with the released
+**Plasmo Voice 2.1.17** plugin (Modrinth `spigot-2.1.17`). Server TCP and voice UDP
+bind only to localhost. Four explicitly named virtual audio endpoints isolate
+capture and playback; system defaults and physical devices are not used.
+
+`tools/check_live.py` drives the real menus and keyboard/mouse events. It verifies:
+
+- all six tabs populated, M → K key capture, persistence and reset;
+- persistent settings, English/Russian switching, selected ALSA input reopening;
+- held PTT and real voice packets in the voice menu, pause, options, inventory
+  and normal gameplay, followed by release;
+- microphone mute prevents transmission while PTT remains held;
+- independent proximity and player sliders retain separate values and reset;
+- Shift + physical RMB + scroll changes the targeted remote player's saved gain;
+- a real generated tone traverses capture, Opus, encrypted UDP, the server,
+  decoding, spatial mixing and the receiving virtual output, with nonzero PCM.
+
+Separate captures verify both audio directions (signed 16-bit RMS **1394** A→B
+and **1935** B→A in that run). The reproducible driver also records an end-to-end
+output capture. [Structured report](docs/validation/sdk-0.6.0-live.json).
+
+[PTT above options](docs/screenshots/sdk-0.6.0-ptt-options.png),
+[visible speaking icon](docs/screenshots/sdk-0.6.0-icon-clear.png), and
+[icon hidden behind stone](docs/screenshots/sdk-0.6.0-icon-wall.png) are actual
+rendered frames, inspected visually. Vanilla name tags may remain visible through
+walls; the microphone icon does not. Entity icons use the current draw pose,
+ordinary perspective and the SDK's full-bright light encoding.
+
+Live testing found and corrected three migration boundary errors: the Paper
+channel announcement, unregistered raw setting writes, and remote-player
+positions resolved through server-only player handles. The final bridge uses
+generic plugin packets, the owned config-file service and client entities.
+Synthetic control-socket clicks intentionally skip Horizon's raw mouse hooks;
+the wheel test uses XTest on the isolated game display for the RMB input.
+
+CI checks Linux/Windows source-built audio and null output, Linux baseline CPU,
+source-API tests/Clippy and unsupported macOS behavior. These do not claim Windows
+GUI, physical microphone/speaker testing or other-mod combinations. The broader
+five-version server matrix below remains historical 0.5.0 evidence. Source-API
+compilation alone is not SDK ABI proof; the separate launcher build supplies it.
 
 ## 0.5.4 current Nightly packaging and disabled audio, 10 November 2026
 

@@ -119,3 +119,15 @@ The client listens through `client_packet`; no owned typed-payload registration
 or protected-channel bypass is used. A golden wire regression covers the three
 capability names and opaque control framing. Connection-state changes and successful
 channel announcement are logged, without keys or audio content.
+
+## Live UI and audio regression
+
+`tools/check_live.py` drives two running isolated clients connected to a local
+Paper server with the actual Plasmo Voice 2.1.17 plugin. Use distinct scratch
+game directories, control sockets, `HORIZON_PLASMO_DIAGNOSTICS=1` and explicitly
+routed virtual audio endpoints. Its `--display-b` must be the receiver's isolated
+Xwayland display, never the user's desktop: raw button hooks intentionally skip
+control-socket synthetic clicks. The driver uses normal public game controls and
+XTest input, then records real PCM, frames and a JSON report. See `--help` for
+required paths. This is an opt-in integration test, not a player-side launcher
+or an installer. See VALIDATION.md for the completed run and its limits.

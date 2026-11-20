@@ -78,8 +78,10 @@ source-built DSP and OpenAL null-output checks. Linux game/menu checks use isola
 player data. CI covers Linux and Windows audio source builds and unsupported macOS.
 
 The five-server audio matrix belongs to **0.5.0**, before this SDK migration.
-Windows GUI, physical audio devices and a new two-player live voice session are
-not claimed for 0.6.0. See [VALIDATION.md](VALIDATION.md) for precise evidence;
+A new two-client Paper 1.21.11 / Plasmo Voice 2.1.17 test verifies audio in both
+directions through explicitly selected virtual input/output devices, PTT over
+interfaces, persisted bindings, player volume and wall occlusion. Windows GUI
+and physical audio-device tests are not claimed for 0.6.0. See [VALIDATION.md](VALIDATION.md) for precise evidence;
 [PARITY.md](PARITY.md) describes existing feature limits.
 
 ## Source

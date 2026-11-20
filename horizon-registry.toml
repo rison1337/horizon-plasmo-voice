@@ -29,5 +29,5 @@ Native code uses selected audio devices, the joined server's advertised voice en
 
 This is not an official Plasmo Voice or Horizon release. Original Plasmo Voice implementation sources and graphics were not read or copied. Independent protocol reference and third-party notices are in the source repository.
 
-0.6.0 has an actual optimized signed-SDK launcher build, Linux game/menu checks, engine/adapter regressions, OpenSSL RSA interoperability and source-built DSP/null-output tests. Earlier five-server tests belong to 0.5.0, before the migration. A new two-player live session, Windows GUI and physical audio-device tests are not claimed. See VALIDATION.md for exact revisions and evidence.
+0.6.0 has an actual optimized signed-SDK launcher build, Linux game/menu checks, engine/adapter regressions, OpenSSL RSA interoperability and source-built DSP/null-output tests. Earlier five-server tests belong to 0.5.0, before the migration. Two isolated clients also pass a Paper 1.21.11 / Plasmo Voice 2.1.17 session with generated audio in both directions, PTT across interfaces, saved bindings, player volume and world-icon occlusion. Windows GUI and physical audio-device tests are not claimed. See VALIDATION.md for exact revisions and evidence.
 """

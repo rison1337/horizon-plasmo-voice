@@ -16,7 +16,7 @@ This record is separate from the historical native-v1 tests below.
   Signed SDK verification passes; the game/SDK are not recompiled or patched.
 - The actual packaged `.hmod` was extracted into an isolated project and passed
   launcher `native-build`, not just ordinary API-source compilation. Build
-  `native-f00125f-8541a04f70b3` completed in **17 seconds** after dependency caching.
+  `native-f00125f-8bc25dd8161f` completed in **4 seconds** after dependency caching.
   [Launcher build record](docs/validation/sdk-0.6.0-native-build.json).
 - Mod-owned registry dependencies compile against immutable SDK binaries;
   conflicting CPAL/ALSA providers were removed. The selected physical device

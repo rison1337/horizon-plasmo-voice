@@ -73,7 +73,9 @@ Individual player, source and master gains multiply.
 Minecraft server-version support belongs to Horizon. This mod neither enables
 old adapters nor alters inventory decoding. The historical server matrix is in
 [docs/SERVER_COMPATIBILITY.md](docs/SERVER_COMPATIBILITY.md); its old environment
-settings are not installation requirements for the new SDK release.
+settings describe those historical runs. For the SDK build tested here, joining
+1.21.11 still uses Horizon's experimental `HORIZON_OLDER_SERVERS=1` instance
+environment setting. This is a game adapter opt-in, not a voice-mod patch.
 
 ## Data and permissions
 

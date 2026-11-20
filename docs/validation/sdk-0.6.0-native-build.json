@@ -8,26 +8,26 @@
   "left_out": [],
   "target": "client",
   "rust_target": null,
-  "secs": 9,
+  "secs": 4,
   "mods": [
     {
       "id": "plasmo_voice",
       "version": "0.6.0",
-      "sha256": "557070101b62bb419b1031121e9526d5cec19f1b55e079b3242d607b8dc29eeb",
+      "sha256": "c287f7967c6e1ec1e2d9da821168e189f1d5d485854bd638fea58491829b4c3f",
       "internals": []
     }
   ],
   "libraries": [
     {
       "file": "libhorizon_plasmo_voice.so",
-      "sha256": "a94ebd2cf914a9a8e6fd3e72d83d50a38efed9e54a95f8e9a1cc261c5c9ececa",
+      "sha256": "f0c3300684d07d7f681ab9cd8c8fe8a1a426d6941a0492ec32271ea2b72b66c6",
       "kind": "mod",
       "mod": "plasmo_voice",
       "identity": "f00125f61f794aaa3d4e950d301f353b35b6ee3d plasmo_voice 0.6.0 1.99.1"
     },
     {
       "file": "libhorizon_patch.so",
-      "sha256": "2a3140e7be8c35f71088ef8a8cdb8a4e4845b383ede1ded07fb72b917d39b993",
+      "sha256": "436a5d470e6a7a41da5f7f016bad10d2ecd2d4f6d97ebf728573ad5963615003",
       "kind": "patch",
       "mod": "horizon_patch",
       "identity": "f00125f61f794aaa3d4e950d301f353b35b6ee3d horizon_patch 0 1.99.1"

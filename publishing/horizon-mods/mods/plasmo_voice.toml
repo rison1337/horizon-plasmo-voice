@@ -29,7 +29,7 @@ Native code uses selected audio devices, the joined server's advertised voice en
 
 This is not an official Plasmo Voice or Horizon release. Original Plasmo Voice implementation sources and graphics were not read or copied. Independent protocol reference and third-party notices are in the source repository.
 
-0.6.0 has an actual optimized signed-SDK launcher build, Linux game/menu checks, engine/adapter regressions, OpenSSL RSA interoperability and source-built DSP/null-output tests. Earlier five-server tests belong to 0.5.0, before the migration. A new two-player live session, Windows GUI and physical audio-device tests are not claimed. See VALIDATION.md for exact revisions and evidence.
+0.6.0 has an actual optimized signed-SDK launcher build, Linux game/menu checks, engine/adapter regressions, OpenSSL RSA interoperability and source-built DSP/null-output tests. Earlier five-server tests belong to 0.5.0, before the migration. Two isolated clients also pass an actual Paper 1.21.11 / Plasmo Voice 2.1.17 session with generated audio in both directions, PTT across interfaces, saved bindings, player volume and world-icon occlusion. Windows GUI and physical audio-device tests are not claimed. See VALIDATION.md for exact revisions and evidence.
 """
 
 [[versions]]
@@ -37,5 +37,5 @@ version = "0.6.0"
 published = "2026-11-20"
 game = "26.3"
 file = "plasmo-voice-0.6.0.hmod"
-sha256 = "1b0cf492669808a529c2c6f665ed3f071720e92aa383971aec6e89fa42a2a582"
+sha256 = "0b4bb9d55614c8b3215b67d229d7cd868b59dcdc43d2758ae3546bb9806e6da8"
 changelog = "Migrates to signed SDK API 0.2 and a flat source-only .hmod. Current-frame world icons, asynchronous offline audio preparation and OpenAL capture/playback. Preserves voice controls and translated UI; removes legacy bundle/injection/install paths."

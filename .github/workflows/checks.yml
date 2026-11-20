@@ -12,7 +12,7 @@ jobs:
   engine:
     runs-on: ubuntu-latest
     env:
-      PLASMO_AUDIO_CACHE: ${{ runner.temp }}/plasmo-audio
+      PLASMO_AUDIO_CACHE: ${{ github.workspace }}/.local/ci-audio
       CARGO_BUILD_JOBS: 2
     steps:
       - uses: actions/checkout@v7
@@ -37,7 +37,7 @@ jobs:
       - name: Missing CMake disables only voice
         env:
           CMAKE: /missing/plasmo-test-cmake
-          PLASMO_AUDIO_CACHE: ${{ runner.temp }}/plasmo-no-cmake
+          PLASMO_AUDIO_CACHE: ${{ github.workspace }}/.local/ci-no-cmake
         run: |
           cargo test --workspace --locked --test unavailable
           cargo run --locked -p horizon-plasmo-engine --bin plasmo-voice-runtime -- --expect-disabled missing_cmake
@@ -80,7 +80,7 @@ jobs:
   unsupported-platform:
     runs-on: macos-latest
     env:
-      PLASMO_AUDIO_CACHE: ${{ runner.temp }}/plasmo-audio
+      PLASMO_AUDIO_CACHE: ${{ github.workspace }}/.local/ci-audio
     steps:
       - uses: actions/checkout@v7
       - uses: dtolnay/rust-toolchain@stable

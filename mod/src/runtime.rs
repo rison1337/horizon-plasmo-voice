@@ -1158,7 +1158,7 @@ fn refresh_head_anchors(game: &dyn Host, state: &mut State) {
     }
 }
 
-fn head_icon_position(head: &NativeClientHead) -> [f64; 3] {
+pub(super) fn head_icon_position(head: &NativeClientHead) -> [f64; 3] {
     let at = glam::DVec3::from_array(head.origin);
     let mut center = at + glam::DVec3::Y * f64::from(head.height);
     let mut top = center.y;

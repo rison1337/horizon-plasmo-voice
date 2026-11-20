@@ -107,3 +107,15 @@ Original artwork is in `branding/`; `python3 tools/export_branding.py` exports
 sizes using ImageMagick and rsvg-convert. The package's `mod/icon.png` and catalog
 icon share that artwork. In-game pixel textures are exported from the original
 Rust icon design.
+
+## Paper plugin-channel interoperability
+
+Plasmo Voice does not negotiate Horizon's typed payload transport. The client
+announces all three channels in `protocol::REGISTER` through the public generic
+`ClientHost::send_packet` API, then sends unchanged Plasmo control bodies on
+`plasmo:voice/v2`. The SDK validates and translates the vanilla play packet.
+`play_raw` is a server registration API, not a client channel announcement.
+The client listens through `client_packet`; no owned typed-payload registration
+or protected-channel bypass is used. A golden wire regression covers the three
+capability names and opaque control framing. Connection-state changes and successful
+channel announcement are logged, without keys or audio content.

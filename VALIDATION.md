@@ -22,12 +22,17 @@ This record is separate from the historical native-v1 tests below.
   conflicting CPAL/ALSA providers were removed. The selected physical device
   API is now an independent published-ABI OpenAL wrapper.
 
-Local checks pass: **24 regular engine tests**, **8 adapter/source-API tests**,
+Local checks pass: **24 regular engine tests**, **9 adapter/source-API tests**,
 RNNoise suppression and HRTF loopback, and the new explicit OpenAL **null-output**
 queue/underrun/reopen test. An independent OpenSSL process encrypts a test session
 key with the mod's DER public key using PKCS#1 v1.5; blinded RSA decryption succeeds
 and a truncated ciphertext is rejected. No physical audio device is used.
 A fresh-cache missing-CMake test confirms codecs and voice workers stay disabled.
+A player test found that the first migration used the negotiated payload send
+service for a legacy Paper plugin channel and omitted its capability announcement.
+The client now uses the documented generic play-packet API and announces all three
+Plasmo channels. A wire regression covers this boundary; release validation must
+use the corrected build, not the earlier successful compilation alone.
 
 The official package checker accepts the flat manifest/source/resource layout.
 The recursive source inspector verifies all three original archives and finds

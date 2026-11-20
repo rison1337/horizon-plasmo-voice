@@ -10,7 +10,8 @@ permissions:
 
 jobs:
   engine:
-    runs-on: ubuntu-latest
+    # Keep the baseline-CPU test on a userland that supports original x86_64.
+    runs-on: ubuntu-24.04
     env:
       PLASMO_AUDIO_CACHE: ${{ github.workspace }}/.local/ci-audio
       CARGO_BUILD_JOBS: 2
@@ -97,6 +98,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       - uses: msys2/setup-msys2@v2
+        id: msys2
         with:
           msystem: MINGW64
           update: true
@@ -109,7 +111,11 @@ jobs:
       - name: Source-built codec, DSP and null-output tests
         shell: pwsh
         run: |
-          $env:Path = "C:\msys64\mingw64\bin;" + $env:Path
+          $mingwBin = Join-Path '${{ steps.msys2.outputs.msys2-location }}' 'mingw64\bin'
+          $env:Path = $mingwBin + ';' + $env:Path
+          $env:CC = Join-Path $mingwBin 'gcc.exe'
+          $env:CXX = Join-Path $mingwBin 'g++.exe'
+          & $env:CXX --version
           $env:PLASMO_AUDIO_CACHE = Join-Path $env:RUNNER_TEMP 'plasmo-audio'
           $env:ALSOFT_DRIVERS = 'null'
           cargo test --workspace --locked --target x86_64-pc-windows-gnu

@@ -476,9 +476,9 @@ pub(crate) fn player_icon(host: &dyn ClientHost, event: &mut mod_api::RenderPlay
     let bounds = entity.bounding_box(host);
     let height = bounds.map_or(1.8, |b| (b[1][1] - b[0][1]) as f32);
     let head = event.parts.and_then(|p| p.get(mod_api::HumanoidPart::Head));
-    let position = if let Some(head) = head {
+    let transform = head.map(|head| {
         let p = head.pose;
-        let pose = glam::Mat4::from_translation(glam::Vec3::new(0., 1.501, 0.))
+        (glam::Mat4::from_translation(glam::Vec3::new(0., 1.501, 0.))
             * glam::Mat4::from_scale(glam::Vec3::new(-1., -1., 1.))
             * glam::Mat4::from_translation(glam::Vec3::new(p.x, p.y, p.z) / 16.)
             * glam::Mat4::from_quat(glam::Quat::from_euler(
@@ -487,27 +487,20 @@ pub(crate) fn player_icon(host: &dyn ClientHost, event: &mut mod_api::RenderPlay
                 p.y_rot,
                 p.x_rot,
             ))
-            * glam::Mat4::from_scale(glam::Vec3::new(p.x_scale, p.y_scale, p.z_scale));
-        let center = pose.transform_point3(glam::Vec3::new(0., -0.25, 0.));
-        // A vanilla helmet expands the head by at most 1.5/16 block. Include
-        // all eight expanded corners, so pitch cannot move it into the icon.
-        let pad = 1.5 / 16.;
-        let mut top = f32::NEG_INFINITY;
-        for x in [-0.25 - pad, 0.25 + pad] {
-            for y in [-0.5 - pad, pad] {
-                for z in [-0.25 - pad, 0.25 + pad] {
-                    top = top.max(pose.transform_point3(glam::Vec3::new(x, y, z)).y);
-                }
-            }
-        }
-        glam::Vec3::new(
-            center.x,
-            top.max(height) + 0.18 + crate::runtime::HEAD_ICON_SIZE * 0.5,
-            center.z,
-        )
-    } else {
-        glam::Vec3::new(0., height + 0.18 + crate::runtime::HEAD_ICON_SIZE * 0.5, 0.)
+            * glam::Mat4::from_scale(glam::Vec3::new(p.x_scale, p.y_scale, p.z_scale)))
+        .to_cols_array()
+    });
+    // Share the tested helmet and name-tag clearance calculation with the HUD
+    // fallback. Coordinates here remain local to the current entity draw pose.
+    let anchor = ui::NativeClientHead {
+        height,
+        transform,
+        outer_layer_padding: 1.5 / 16.,
+        name_anchor: [0., f64::from(height) + 0.5, 0.],
+        name_half_width: 1.,
+        ..Default::default()
     };
+    let position = glam::DVec3::from_array(crate::runtime::head_icon_position(&anchor)).as_vec3();
     let to_local = glam::Mat3::from_rotation_y(event.player.body_yaw.to_radians());
     let right = to_local * glam::Vec3::new(camera.view[0], camera.view[4], camera.view[8]);
     let up = to_local * glam::Vec3::new(camera.view[1], camera.view[5], camera.view[9]);

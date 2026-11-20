@@ -33,3 +33,5 @@ session*.json
 /mod/.horizon/
 
 !/tools/lock_sdk_registry.py
+
+!/tools/check_live.py

@@ -158,8 +158,12 @@ impl VoiceHost for Bridge<'_> {
         let entities = level
             .and_then(|l| l.entities_in(h, min, max))
             .unwrap_or_default();
+        let local = h.local_player().map(|p| p.entity());
         entities
             .into_iter()
+            // The local hit box contains the ray origin. Keeping it here
+            // would hide every remote target during player-volume picking.
+            .filter(|entity| Some(*entity) != local)
             .filter_map(|entity| {
                 let position = entity.position(h)?;
                 let name = entity.name(h);

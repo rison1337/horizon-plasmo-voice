@@ -58,6 +58,7 @@ def main():
         return ctl(n, 'ui')['widgets']
 
     # No fake worker snapshots: wait through real input, frames and device queues.
+    ctl(0, 'command', 'kill @e[type=!minecraft:player]')
     for n in (0, 1):
         ctl(n, 'key', 'key.keyboard.left.alt', 'up')
         ctl(n, 'close')
@@ -133,6 +134,8 @@ def main():
         ctl(0, 'key', 'key.keyboard.left.alt', 'up')
 
         # The remote-player handle, picking and persistence all participate.
+        target = ctl(0, 'state')['player']['position']
+        ctl(1, 'look-at', target[0], target[1] + 1.3, target[2])
         ctl(1, 'mouse', 'right', 'down')
         ctl(1, 'key', 'shift', 'down')
         ctl(1, 'scroll-at', 240, 135, 1)

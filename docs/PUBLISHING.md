@@ -1,103 +1,26 @@
-# Publishing checklist and prepared catalog entry
+# Publishing
 
-The owner authorized public source and a catalog submission after Horizon
-PR #9812 merged. Version 0.5.4 uses the official native API minimum **411**.
-The files under `publishing/horizon-mods/` are the submission material. Catalog
-acceptance is a separate maintainer decision; a GitHub Release alone does not
-make the mod appear in Horizon Launcher.
+Publish the flat `mod/` SDK project as an immutable `.hmod` GitHub release asset.
+`tools/package_sdk.py` checks the artifact and produces its SHA-256 file.
 
-The source is public and the normal
-[v0.5.4 release](https://github.com/rison1337/horizon-plasmo-voice/releases/tag/v0.5.4)
-is published. [Catalog PR #305](https://github.com/horizon-rust/horizon-mods/pull/305)
-contains the entry, icon and local check results. It requests the reviewer's
-required staging upload; neither the release nor this submission claims catalog
-acceptance.
+1. Run engine, DSP/null-output, adapter and independent OpenSSL checks.
+2. Run a real launcher build against the exact signed SDK; record the prebuilt
+   route, build/toolchain identities and actual game-test scope in VALIDATION.md.
+3. Check documentation, notices, source archives, CI and package contents.
+4. Commit the source, create a version tag and publish the `.hmod` and checksum.
+   Never replace published bytes; fixes receive a new version.
+5. Check the current submission rules. As of 20 November 2026, the website form
+   explicitly cannot accept SDK `.hmod` files. The supported route is a PR in
+   [horizon-mods](https://github.com/horizon-rust/horizon-mods), with the release
+   download link, entry, icon and exact-SDK build evidence.
+6. Stage/check using the catalog's exact `.github/horizon-rev`. The registry's
+   `stage` workflow downloads linked release assets and verifies their name/hash.
+   Maintainer review and merge make the mod appear in the site/launcher catalog.
 
-1. Package the registered API using its actual minimum. Run the adapter checks,
-   engine tests and `cargo horizon-mod check`.
-2. Review the source, README, license, runtime notices and release notes. Make
-   the repository public only when its owner chooses to publish it.
-3. Publish a normal GitHub Release with the immutable `.hnmod` asset. Keep the
-   release version consistent with both manifests. Never replace published bytes.
-4. Submit the project through https://playhorizon.dev/mods/submit, or open a PR
-   in https://github.com/horizon-rust/horizon-mods using the prepared entry and
-   `icons/plasmo_voice.png`. The listing type is `native-mod`, id `plasmo_voice`.
-5. Registry review and acceptance make the project appear on the site and in
-   the launcher's Horizon catalog. Creating this repository alone does not.
+Prepared entry/icon live in `publishing/horizon-mods/`. Update metadata only with
+actual artifact hashes and dates. The closed legacy PR #305 remains historical;
+the SDK migration needs a new submission. A release alone is not catalog approval.
 
-A public catalog listing needs public source. Native mods also have Horizon's
-trust/build prompts. Registration of the voice mod and registration of the
-Horizon hooks are separate steps.
-
-The entry's icon is a square PNG under 256 KiB. Its name, summary, authors and
-license are mirrored in `horizon-registry.toml`. Published version entries use
-the actual artifact hash and date. No signature or download count is invented.
-
-The catalog currently publishes explicit `[[versions]]` entries. A `repo` field
-alone does not populate its existing index workflow. A manual submission also
-needs a reviewer to copy the public release asset to the catalog's `staging`
-release as `<sha256>.hnmod`, as its PR template specifies. The submission must
-provide the source release, exact SHA-256 and local registry-check results;
-catalog access is not implied by owning the mod's separate source repository.
-
-## GitHub artwork
-
-- README/project logo: `assets/icon-256.png`.
-- Launcher catalog icon: `publishing/horizon-mods/icons/plasmo_voice.png`.
-- Social preview: `assets/github-social.png`, 1280 × 640.
-
-GitHub social-preview artwork is uploaded through repository Settings → General
-→ Social preview. The README already references the shared logo and banner.
-GitHub permits a first social-preview upload on a public repository; a new private
-repository cannot be assigned its first custom preview yet. Keep the supplied
-image for publication instead of changing this repository's visibility.
-Reference: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/customizing-your-repositorys-social-media-preview
-
-## Release notes
-
-**0.5.4 — current Nightly and unavailable build tools**
-
-- Uses one declared engine crate for protocol, runtime build and post-build install.
-- Removes all path dependencies between bundle crates and uses only dependencies
-  already present in Horizon’s Cargo.lock, including cc and sha2 for the build.
-- Uses the local CMake executable directly; no cmake or tar Rust crate is needed.
-- Unsupported platforms and unavailable tools build with voice disabled and a
-  translated explanation, rather than failing the combined game build.
-
-**0.5.3 — source-built audio dependencies**
-
-- Removes all six prebuilt Linux/Windows native libraries from the package.
-- Vendors exact upstream Opus 1.6.1, RNNoise 0.2 and OpenAL Soft 1.25.2 sources;
-  SHA-256 verification and local CMake compilation happen during the mod build.
-- Keeps complete source, licenses and build provenance with the installed runtime.
-- Adds Windows engine/DSP CI and a source-only package inspection tool.
-- Requires C/C++ and CMake; Windows GNU also requires Ninja on PATH.
-
-**0.5.2 — connection indicators**
-
-- Hides the activation HUD until the server starts a real Plasmo Voice handshake.
-- Limits stalled handshake stages to 15 seconds; timeout/error and listen-only
-  operation use static warnings. Delayed server handshakes remain supported.
-- Six adapter regressions and all 23 engine tests pass, including real encrypted
-  UDP loopback. Earlier voice-version and CPU checks keep their original scope.
-
-**0.5.1 — player-volume controls**
-
-- Requires Shift + the action key (RMB by default) + scroll; either Shift key works.
-- Displays volume only after an actual change, and expires after 1.5 seconds
-  even if the buttons remain held. Normal scrolling retains hotbar behavior.
-- Five adapter regressions, Clippy, and an isolated two-client physical-input/HUD
-  check pass. The unchanged engine retains the documented 0.5.0 voice matrix.
-
-**0.5.0 — native Hooks/Host client**
-
-- Replaces private Game injections with public Hooks/Host callbacks and services.
-- Preserves proximity audio, activation modes, six settings tabs and bindings.
-- Keeps PTT and its indicator active over normal interfaces.
-- Uses current-frame head poses with helmet/name clearance and block visibility.
-- Provides per-player gain and RMB/wheel control alongside source/master levels.
-- Ships Linux x86_64 and Windows x64 codec/DSP runtimes in one `.hnmod`.
-- Adds a shared original Minecraft-inspired pixel microphone identity.
-
-State the actual official API minimum and tested Horizon commit in the final
-release notes. Retain the documented Windows GUI/device-testing limitation.
+The original project artwork is in `branding/`; `mod/icon.png` and
+`publishing/horizon-mods/icons/plasmo_voice.png` use the same icon.
+GitHub's social preview is `branding/github-social.png`.

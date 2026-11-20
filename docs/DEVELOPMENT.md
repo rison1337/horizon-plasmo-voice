@@ -1,134 +1,109 @@
-# Development
+# Development — SDK 0.6.0
 
-## Engine
+`mod/` is the complete distributable flat project. It uses only the public
+`horizon-mod-api` dependency (`mod_api`) fetched by the official checker into
+`mod/.horizon/sdk/`. The manifest pins build
+`f00125f61f794aaa3d4e950d301f353b35b6ee3d` and Mixins
+`e59da9094f0c2fdda6c627fe9eff22dec6a906f0`; the published SDK selects Rust 1.99.1.
+No core patches, internals facade, injections, native-hooks.json, mod build.rs,
+custom game distribution or mod-owned SDK rebuild is used.
 
-Install stable Rust, C/C++ compilers, CMake and the development packages used
-by CPAL. For example, on Debian/Ubuntu:
+## Engine checks
+
+Install C/C++, CMake, pkg-config and Linux ALSA development headers. Windows GNU
+also needs Ninja. The development workspace uses exactly `mod/src/voice/`:
 
 ```sh
-sudo apt-get install build-essential cmake pkg-config libasound2-dev libudev-dev
 cargo test --workspace --locked
-cargo test --workspace --test hrtf --test denoise -- --ignored
+cargo test --workspace --locked --test hrtf --test denoise -- --ignored
+ALSOFT_DRIVERS=null cargo test --workspace --locked --test device_output -- --ignored
 cargo run --locked -p horizon-plasmo-engine --bin plasmo-voice-runtime -- --check
 cargo fmt --all -- --check
 cargo clippy --workspace --all-targets --locked -- -D warnings
 ```
 
-These commands exercise the standalone engine; they do not launch a game.
-No system Opus, RNNoise or OpenAL install or library-path override is required.
-
-### Reviewable native dependencies
-
-`engine/build.rs` verifies the SHA-256 of the three immutable upstream source
-archives in `engine/data/sources/`, extracts them into Cargo's `OUT_DIR`, and
-runs CMake to compile shared libraries for the target. Its build does not fetch
-anything from the network. `engine/data/sources.json` lists original URLs,
-versions, licences and archive hashes. The unmodified source archives are the
-reviewable payload; no `.so`, `.dll`, object or executable is bundled.
-
-Opus 1.6.1 and RNNoise 0.2 use generic scalar C; baseline x86_64 flags avoid
-host-specific CPU instructions. OpenAL Soft 1.25.2 retains upstream runtime
-CPU dispatch and its embedded HRTF dataset, with only loopback/null backends.
-CPAL continues to own the user's recording and playback devices. OpenAL stays
-a separately loaded LGPL library; no implementation is copied into Rust.
-
-The post-build installer embeds only the libraries produced by that Cargo
-build. It installs those outputs, licence notices, and complete corresponding
-source archives beside the executable, then tests Opus/RNNoise/HRTF without
-physical devices. Its receipt records hashes of installed outputs. The loader
-uses absolute installed paths, or that build's output for development; it never
-falls back to an arbitrary system codec or DLL on PATH.
-
-Source builds use the player's local C/C++ ABI, rather than distributing a
-precompiled library tied to the developer's GLIBC. Linux needs the headers
-above. Windows x64 GNU needs MinGW-w64 C/C++ and CMake and Ninja on PATH (the launcher
-provides its Rust/MinGW toolchain; install CMake and Ninja if absent). Windows MSVC and
-macOS build a disabled voice client instead of failing the game build. CI checks baseline CPU codec/DSP loopback.
-
-## Hooks/Host adapter
-
-Clone Horizon next to this repository, then stage a disposable development
-worktree. The explicit revision below reproduces the accepted-source check:
+Tests use generated signals, loopback DSP and the explicitly selected null output,
+not physical devices. Use `PLASMO_AUDIO_CACHE=/absolute/scratch/path` to isolate
+prepared audio. For the missing-tool path, choose a **fresh cache**:
 
 ```sh
-git clone --filter=blob:none https://github.com/horizon-rust/horizon ../horizon
-python3 tools/prepare_native_api.py --horizon ../horizon \
-  --revision fdc87aecdbd116bf1e08adcd062fcbaea8c2e2ca
-cargo test --manifest-path .local/native-api-accepted/Cargo.toml \
-  -p horizon-plasmo-native --lib
-cargo clippy --manifest-path .local/native-api-accepted/Cargo.toml \
-  -p horizon-plasmo-native --all-targets -- -D warnings
+CMAKE=/missing/cmake PLASMO_AUDIO_CACHE=/fresh/scratch/cache cargo test --workspace --locked --test unavailable
 ```
 
-`prepare_native_api.py` adds the adapter, engine, development wrapper and runtime
-data to the disposable workspace. It does not patch the Horizon core. Use
-`--refresh-adapter` to refresh mod sources in an existing staged workspace;
-use a new `--out .local/<name>` to select a different core revision.
+## SDK adapter and packaging
 
-## Package
-
-The official API minimum is **411**, registered by Horizon PR #9812. Build a
-release from its clean public source, or a compatible later source whose actual
-API level you have tested:
+Install the official `cargo-horizon-mod` checker for the manifest's exact build.
+The catalog's current checker pin is in `horizon-rust/horizon-mods/.github/horizon-rev`.
+Then:
 
 ```sh
-python3 tools/package_native_api.py --source /path/to/registered/horizon
+cd mod
+cargo horizon-mod check
+cd ..
+python3 tools/check_sdk.py --interop
+python3 tools/check_sdk.py --clippy
+python3 tools/package_sdk.py
 ```
 
-The output is `dist/plasmo-voice-0.5.4.hnmod`. To reproduce the release's core
-revision, stage it explicitly:
+`--interop` requires the OpenSSL command and checks RSA SPKI/PKCS#1 v1.5 exchange
+with an independent implementation. The adapter script copies source and API to
+`.local/` before ordinary Cargo tests, preserving the mod's registry lock.
+Its source-API build is not evidence of prebuilt SDK ABI compatibility.
+
+The package tool runs the official build/checker and the recursive source-payload
+inspection, then writes `.hmod` plus SHA-256 under `dist/`. Packaging never compiles
+the bundled audio archives. `.horizon/`, development targets and player files are
+excluded. Keep the root workspace and `mod/Cargo.lock` separate.
+
+## Actual signed-SDK build
+
+Install and prepare the matching official Nightly in a disposable launcher home,
+using your own Minecraft installation, then:
 
 ```sh
-python3 tools/prepare_native_api.py --horizon ../horizon \
-  --revision fdc87aecdbd116bf1e08adcd062fcbaea8c2e2ca --out .local/native-api-release
-python3 tools/package_native_api.py --source .local/native-api-release
+horizon-launcher native-build /absolute/path/to/mod --instance TEST_INSTANCE --trust-native-code --json
 ```
 
-The tool checks the committed API catalog and retains the actual required minimum
-411 when testing a newer Nightly. Package output and SHA-256 are printed as JSON.
-The registry's final file check is `cargo horizon-mod check <file.hnmod>`.
-The explicit `--pinned` option remains available for development-only checks on
-older source whose required APIs are still pending; it is not a release mode.
+This must take the **prebuilt** route and compile only the mod. The launcher's
+`native-mods.json` records build, toolchain, route and mod/library identities.
+Record that result and game tests separately from source-only adapter tests.
+Never publish prepared resources, game jars, compiled SDK binaries or account files.
 
-For playing, let the official launcher build in **Performance** mode. Keep live
-tests isolated from real game data; prepare resources from your own Minecraft
-copy. Do not commit or print account/session files. Device tests should use
-explicitly configured virtual devices unless a human has chosen a physical test.
+## Registry dependency lock
 
-## Bundle compatibility regression
+The SDK's registry identities and dependency edges are immutable. A plain Cargo
+resolution of API source is different from linking the prebuilt SDK. The launcher
+owns the final registry/SDK reconciliation; do not update its game lock.
 
-Use the exact Nightly's cargo-horizon-mod and horizon-mixins executables:
+`tools/lock_sdk_registry.py --sdk-lock /path/to/published-sdk/Cargo.lock` resolves
+an inert manifest, preserving the SDK graph while adding the mod's private
+registry dependencies. It executes no submitted build scripts or proc macros.
+Use it only when deliberately changing dependencies, then validate with the real
+launcher build above. Never regenerate the release lock as a side effect of tests.
 
-```sh
-python3 tools/check_native_bundle.py --source /path/to/public/horizon \
-  --mixins /path/to/horizon-mixins --mod-tool /path/to/cargo-horizon-mod \
-  --work .local/bundle-check
-```
+CPAL was removed because it introduced a conflicting native ALSA provider against
+the SDK. The independent OpenAL 1.1 ABI wrapper now owns selected capture/playback
+devices as well as loopback HRTF. Public API values do not cross private registry
+serde/glam/RSA implementations: the bridge converts plain data at that boundary.
 
-This checks the packaged artifact, applies its declared crate, compares all
-registry package versions/sources/checksums, stages the trait adapter at the
-launcher's paths, checks it with --locked and runs installed codec/DSP APIs.
-It does not start a game or access real player data. CI repeats this on the
-release's exact public Nightly. The single engine crate's dependencies must
-remain in that Nightly's lock; never update the core lock to make it pass.
+## Reviewable audio preparation
 
-To check the unavailable-tool path explicitly:
+Complete unmodified sources and notices live under `mod/assets/plasmo_voice/audio/`.
+Original Rust verifies SHA-256, confines extraction/build to an instance cache,
+uses one compiler job and writes a hash receipt. A background worker does this
+once; UI/render input never blocks on CMake. Failed preparations require an
+explicit retry. CMake processes are cancelled on client shutdown. Cache loading
+never falls back to arbitrary codecs on PATH.
 
-```sh
-CMAKE=/missing/plasmo-cmake cargo test --locked -p horizon-plasmo-engine --test unavailable
-CMAKE=/missing/plasmo-cmake cargo run --locked -p horizon-plasmo-engine \
-  --bin plasmo-voice-runtime -- --expect-disabled missing_cmake
-```
+Opus/RNNoise use generic C with baseline x86_64 flags. OpenAL remains a separate
+LGPL shared library with its complete corresponding source available locally.
+ALSA (Linux), WASAPI (Windows), null and loopback backends are enabled; PulseAudio
+and PipeWire native backends are not. Physical device behavior requires separate
+manual testing.
 
-## Brand assets
+## Branding
 
-The source icon and exact generation prompts are in `assets/`. Export required
-sizes and the GitHub social preview with:
-
-```sh
-python3 tools/export_branding.py
-```
-
-This uses ImageMagick and `rsvg-convert` for deterministic size/layout exports.
-The original illustration is kept unchanged. Assets are shared by README,
-GitHub preview and the prepared Horizon catalog entry.
+Original artwork is in `branding/`; `python3 tools/export_branding.py` exports
+sizes using ImageMagick and rsvg-convert. The package's `mod/icon.png` and catalog
+icon share that artwork. In-game pixel textures are exported from the original
+Rust icon design.

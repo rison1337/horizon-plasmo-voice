@@ -38,28 +38,29 @@ Additional interoperability and behavior references (no implementation copied):
   https://openal-soft.org/openal-extensions/SOFT_loopback.txt
   https://openal-soft.org/openal-extensions/SOFT_HRTF.txt
   https://openal-soft.org/openal-extensions/EXT_thread_local_context.txt
-Version 0.5.4 builds its audio dependencies from complete unmodified source
-archives during Cargo compilation. No precompiled .so/.dll or executable is
-included in the native mod package. Source URLs, versions, licences and verified
-SHA-256 values are in engine/data/sources.json:
+Version 0.6.0 packages complete unmodified audio sources under
+mod/assets/plasmo_voice/audio/. sources.json records original URLs, versions,
+licenses and verified SHA-256 values. No precompiled executable audio payload
+is included. First-use preparation verifies and compiles them offline in the
+instance's .plasmo_voice/audio/ cache, retaining sources and notices.
 
 - Opus 1.6.1: BSD-3-Clause; COPYING in its release archive.
 - RNNoise 0.2: BSD-3-Clause; COPYING in its release archive.
-- OpenAL Soft 1.25.2: LGPL-2.0-or-later; COPYING and the individual upstream file
-  notices in its complete source archive. It is built as a separate shared
-  library and accessed only through the documented API. Its source archive is
-  included in the .hnmod and installed alongside the locally built library;
-  users can rebuild or replace the shared library. Original implementation
-  sources were not read or adapted into the independent Rust code.
+- OpenAL Soft 1.25.2: LGPL-2.0-or-later; COPYING and individual upstream notices
+  are kept in its complete archive. It is a separate shared library used only
+  through published OpenAL/ALC APIs, including capture/playback, loopback,
+  HRTF and thread-local contexts. Users can rebuild or replace that shared
+  library. Original implementation sources were not read or copied into Rust.
 
-The Cargo build verifies each archive before extraction. Opus/RNNoise use their
-generic C implementations, and OpenAL's published CMake build supplies its
-loopback renderer and embedded HRTF data. Complete source notices are retained;
-the post-build installer copies the three upstream COPYING files to licenses/.
-UI icons remain original code-drawn primitives.
+Rust registry dependencies retain their upstream licenses; exact versions and
+checksums are in mod/Cargo.lock. RSA, image decoding and serialization remain
+private to this mod. Horizon's published SDK API is linked through its designated
+mod_api boundary, not redistributed in this source package. No SDK implementation
+is copied into the independent voice code. UI artwork remains original.
 
-Earlier 0.5.0-0.5.2 releases carried prebuilt libraries and their notices. Those
-immutable historical releases remain unchanged; this notice describes 0.5.4.
+Earlier immutable 0.5.x releases retain their original notices and behavior.
+Historical tests and the legacy 0.4.x attribution below do not describe a core
+patch in the current SDK mod.
 
 Historical attribution (local 0.4.x only; not included in the 0.5.0 API adapter):
 Item component compatibility was adapted from Horizon PR #8659,

@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.6.0 — 2026-11-20
+
+- Migrates to the signed Horizon SDK, public ClientHost/Hooks API and flat `.hmod`.
+- Pins published Nightly f00125f / SDK API 0.2; removes legacy bundle/installer tools.
+- Renders player icons in the current entity pass with world depth and helmet clearance.
+- Keeps PTT over interfaces, translated settings, independent player gain and Shift/RMB/wheel controls.
+- Builds verified audio sources offline in an asynchronous instance cache; supports explicit retry and cancels compiler work on game shutdown.
+- Uses an independent OpenAL capture/playback wrapper, avoiding conflicting native ALSA providers.
+- Adds actual signed-SDK build evidence, source-API/OpenSSL regressions and null-output underrun checks.
+
 
 ## 0.5.4 — 2026-11-10
 

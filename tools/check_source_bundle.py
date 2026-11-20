@@ -21,7 +21,6 @@ def executable(name, head):
 
 
 def inspect(path):
-    prefix = 'mixins/plasmo_voice/'
     count = 0
     with zipfile.ZipFile(path) as archive:
         names = archive.namelist()
@@ -30,13 +29,23 @@ def inspect(path):
         if archive.testzip() is not None:
             raise ValueError('ZIP checksum failure')
         for name in names:
+            parts = PurePosixPath(name).parts
+            if name.startswith('/') or '..' in parts or '\\' in name:
+                raise ValueError(f'unsafe ZIP member: {name}')
             if executable(name, archive.read(name)[:8]):
                 raise ValueError(f'prebuilt executable payload: {name}')
-        folder = 'engine' if prefix + 'engine/data/sources.json' in names else 'runtime'
-        manifest = json.loads(archive.read(prefix + folder + '/data/sources.json'))
+        if 'horizon-mod.toml' in names:
+            data_dir = 'assets/plasmo_voice/audio/'
+            source_dir = data_dir + 'sources/'
+        else:
+            prefix = 'mixins/plasmo_voice/'
+            folder = 'engine' if prefix + 'engine/data/sources.json' in names else 'runtime'
+            data_dir = prefix + folder + '/data/'
+            source_dir = data_dir + 'sources/'
+        manifest = json.loads(archive.read(data_dir + 'sources.json'))
         sources = []
         for source in manifest['sources']:
-            filename = prefix + folder + '/data/sources/' + source['archive']
+            filename = source_dir + source['archive']
             data = archive.read(filename)
             digest = hashlib.sha256(data).hexdigest()
             if digest != source['sha256']:

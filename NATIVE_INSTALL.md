@@ -1,93 +1,83 @@
-# Installation
+# Installation — 0.6.0
 
-## Current status
+This release uses a source-only **`.hmod`**, Horizon SDK API 0.2 and Launcher
+0.2.85 or newer. It targets Nightly **2026-11-19**, game build
+`f00125f61f794aaa3d4e950d301f353b35b6ee3d`, Minecraft resources 26.3.
+Do not use the old `.hnmod` release with the SDK runtime.
 
-Download `plasmo-voice-0.5.4.hnmod` from
-[Releases](https://github.com/rison1337/horizon-plasmo-voice/releases/tag/v0.5.4).
-Use a Horizon Nightly with native API **411 or newer**. Both required extensions
-are officially registered by [Horizon PR #9812](https://github.com/horizon-rust/horizon/pull/9812).
-The release records the tested public Horizon commit
-`fdc87aecdbd116bf1e08adcd062fcbaea8c2e2ca` and declares `hooks: 411`, so it can
-also build on compatible later Nightlies.
+## Install through the launcher
 
-See [Development](docs/DEVELOPMENT.md) to build the package yourself.
+1. Install the matching official Nightly and prepare resources from your own
+   Minecraft installation. Select it for the instance.
+2. Open Mods, choose **Add from GitHub**, and use
+   `https://github.com/rison1337/horizon-plasmo-voice/releases/tag/v0.6.0`.
+3. Read and accept Horizon's native-code notice. Build native mods, then Play.
 
-## Add the mod to an instance
+For a manual install, download `plasmo-voice-0.6.0.hmod` from that release and
+place it in the instance's `horizon-native-mods/` before building. Keep only one
+version enabled. No installer, custom game archive or manual DLL copy is needed.
+The launcher compiles only mod code against the signed prebuilt SDK.
 
-1. Open the selected Horizon instance's folder.
-2. Put the single `.hnmod` file in `horizon-native-mods/`.
-3. On the launcher's **Mods** page, enable `plasmo_voice`.
-4. Select **Performance** and press **Build**. Accept the launcher's native-code
-   trust prompt when you choose to install the mod.
-5. Start that instance with **Play**.
+The CLI equivalent, after installing/preparing the official Nightly, is:
 
-Keep only one version of `plasmo_voice` enabled. No client archive, launcher
-script, manual DLL copy, or library search-path setting is required. The package
-contains reviewable sources for Linux x86_64 and Windows x64. Cargo builds
-Opus, RNNoise and OpenAL Soft, and the Rust post-build step installs the local
-compiler outputs and verifies codec/DSP APIs. C/C++ compilers and CMake must be
-available. On Debian/Ubuntu install `build-essential cmake pkg-config libasound2-dev
-libudev-dev`; on Windows GNU use the launcher's MinGW toolchain with CMake and Ninja on PATH.
-
-If CMake/Ninja or a C/C++ compiler is missing, or the target is unsupported
-(including macOS), voice is disabled for that build. The game and other mods
-still build. The mod list and voice settings explain the cause in English or
-Russian. Install the missing tools and rebuild to enable voice.
-
-## Server versions
-
-The mod handles the Plasmo Voice protocol. Minecraft protocol translation is
-Horizon functionality and remains outside this mod.
-
-For older servers supported by Horizon, explicitly add this to the instance's launch
-**Environment variables** field, on either Linux or Windows:
-
-```text
-HORIZON_OLDER_SERVERS=1
+```sh
+horizon-launcher mods add-github https://github.com/rison1337/horizon-plasmo-voice/releases/tag/v0.6.0 --instance YOUR_INSTANCE --trust-native-code
+horizon-launcher native-build --instance YOUR_INSTANCE --trust-native-code
 ```
 
-Save the instance's launch settings and use Play normally. This opt-in is not
-needed for servers using Horizon's pinned Minecraft version. The mod does not
-set it automatically. Horizon requires your own prepared Minecraft **26.3**
-resources even when you join an older server.
+A GitHub release is installable independently of catalog review. It appears in
+the Horizon catalog only after maintainers accept the submission.
 
-The accepted inventory fix is already in Horizon; no item-decoder patch belongs
-in this voice mod. Older protocols remain experimental. In particular, the
-tested core still cannot receive an explicitly configured goat-horn `instrument`
-component from 1.21.10/1.21.11 servers. See the
-[version matrix](docs/SERVER_COMPATIBILITY.md) for the tested cases and upstream fix.
+## Audio prerequisites
 
-## Build requirements
+Audio preparation runs offline in a background worker on first use. It builds
+Opus, RNNoise and OpenAL Soft from the complete verified sources in the package,
+then checks and reuses `.plasmo_voice/audio/` in this instance. Closing the game
+cancels its compiler processes. These are ordinary native compiler commands,
+not downloaded executables; the first preparation can take several minutes.
 
-| Platform | Requirements and current verification |
+| Platform | Requirements |
 | --- | --- |
-| Linux x86_64 | C/C++, CMake, pkg-config, ALSA/libudev development headers; source-built codec/DSP and API 411 game build pass |
-| Windows x64 GNU | Launcher-provided Rust/MinGW; install CMake and Ninja on PATH; source-built codec/DSP pass under Wine, real GUI/devices untested |
+| Linux x86_64 GNU | C/C++, CMake, pkg-config, ALSA development headers |
+| Windows x64 GNU | MinGW-w64 C/C++, CMake and Ninja on the launcher's PATH |
+| macOS / Windows MSVC / other targets | Voice disabled with a translated explanation |
 
-Internet access is needed for the launcher's first source/toolchain build.
-The complete voice-library sources are bundled and compiled locally. Use Performance for playing; unoptimized
-builds are intended for development and can have much lower frame rates.
+On Debian/Ubuntu:
+
+```sh
+sudo apt-get install build-essential cmake pkg-config libasound2-dev
+```
+
+On Windows, the launcher supplies its Rust/MinGW toolchain for the SDK build.
+CMake, Ninja and the C/C++ toolchain must also be reachable by the running game's
+PATH for first audio preparation. Restart the launcher after changing PATH.
+
+Missing tools or failed audio preparation do not prevent the game/mod from
+building. Open **V** for the explanation; after installing tools choose
+**Reconnect voice** to retry. The detailed log is `audio-build.log` under
+`.plasmo_voice/audio/<target-and-hash>/`. No system codec fallback is used.
 
 ## First use
 
-Press **V**, choose your microphone and output device, and select an activation
-mode. Hold **Left Alt** for PTT or enable voice activation. **M** toggles your
-microphone mute. Saved custom bindings take precedence over defaults.
+Press **V**, select input/output devices and choose activation mode. Hold
+**Left Alt** for PTT; **M** toggles microphone mute. Change bindings in Hotkeys.
+Saved custom bindings take precedence over registered game-control defaults.
+The local microphone preview is not sent to the server.
 
-Use the local microphone preview to check input. Nothing from this preview is
-sent to the server. The overlay position and size are configurable. A held-PTT
-indicator and active-transmission indication represent different states; a
-muted microphone does not transmit just because the key is held.
+PTT remains active over interfaces. The indicator distinguishes held activation,
+actual transmission and muted states; a held key does not override mute.
+Aim at another player and hold **Shift + RMB** while scrolling to change their
+volume. The hint appears after an actual change and fades after 1.5 seconds.
+Individual player, source and master gains multiply.
 
-Aim at another player, hold **Shift + RMB**, and scroll to change their individual
-volume. Either Shift key works. The indicator appears only after an actual
-change and fades after 1.5 seconds; holding the buttons alone does not show it.
-Ordinary scrolling keeps its normal hotbar behavior. Individual, source and
-master gains multiply.
+Minecraft server-version support belongs to Horizon. This mod neither enables
+old adapters nor alters inventory decoding. The historical server matrix is in
+[docs/SERVER_COMPATIBILITY.md](docs/SERVER_COMPATIBILITY.md); its old environment
+settings are not installation requirements for the new SDK release.
 
-## Privacy
+## Data and permissions
 
-The mod communicates with the connected server's advertised voice endpoint and
-uses the selected audio devices. Its settings are per Horizon instance. Native
-mods run with the game's normal account permissions; Horizon's standard trust
-prompt applies. The voice mod adds no telemetry service.
+The mod uses selected audio devices, communicates with the joined server's
+advertised voice endpoint and stores instance-local settings/audio cache.
+It adds no telemetry service. Native mods run with the game's account permissions
+and use Horizon's normal trust flow. Review the source before installation.

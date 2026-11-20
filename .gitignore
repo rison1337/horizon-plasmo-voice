@@ -22,9 +22,14 @@ session*.json
 
 # Publish the current toolchain, not machine-specific launcher/test scripts.
 /tools/*
-!/tools/prepare_native_api.py
-!/tools/package_native_api.py
 !/tools/export_branding.py
-!/tools/check_native_api_ptt.py
 !/tools/check_source_bundle.py
-!/tools/check_native_bundle.py
+
+/.horizon/
+*.hmod
+!/tools/package_sdk.py
+!/tools/check_sdk.py
+
+/mod/.horizon/
+
+!/tools/lock_sdk_registry.py

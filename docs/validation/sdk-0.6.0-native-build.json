@@ -1,0 +1,36 @@
+{
+  "base": "nightly-2026-11-19-f00125f",
+  "horizon": "f00125f61f794aaa3d4e950d301f353b35b6ee3d",
+  "horizon_mixins": "e59da9094f0c2fdda6c627fe9eff22dec6a906f0",
+  "rust": "1.99.1",
+  "profile": "optimized",
+  "route": "prebuilt",
+  "left_out": [],
+  "target": "client",
+  "rust_target": null,
+  "secs": 9,
+  "mods": [
+    {
+      "id": "plasmo_voice",
+      "version": "0.6.0",
+      "sha256": "557070101b62bb419b1031121e9526d5cec19f1b55e079b3242d607b8dc29eeb",
+      "internals": []
+    }
+  ],
+  "libraries": [
+    {
+      "file": "libhorizon_plasmo_voice.so",
+      "sha256": "a94ebd2cf914a9a8e6fd3e72d83d50a38efed9e54a95f8e9a1cc261c5c9ececa",
+      "kind": "mod",
+      "mod": "plasmo_voice",
+      "identity": "f00125f61f794aaa3d4e950d301f353b35b6ee3d plasmo_voice 0.6.0 1.99.1"
+    },
+    {
+      "file": "libhorizon_patch.so",
+      "sha256": "2a3140e7be8c35f71088ef8a8cdb8a4e4845b383ede1ded07fb72b917d39b993",
+      "kind": "patch",
+      "mod": "horizon_patch",
+      "identity": "f00125f61f794aaa3d4e950d301f353b35b6ee3d horizon_patch 0 1.99.1"
+    }
+  ]
+}

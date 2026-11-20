@@ -7,10 +7,12 @@ use horizon_plasmo_engine::{
 
 #[test]
 fn unavailable_audio_cannot_load_libraries_or_start_a_voice_worker() {
+    if audio_runtime::prepare().is_ok() {
+        return;
+    }
     let Some(reason) = audio_runtime::unavailable_reason() else {
         return;
     };
-    assert!(audio_runtime::LIBRARIES.is_empty());
     assert!(Opus::load().err().unwrap().contains(reason));
     let client = Client::start(
         "invalid.example".into(),

@@ -1,4 +1,4 @@
-name: Engine checks
+name: SDK and audio checks
 
 on:
   push:
@@ -11,79 +11,87 @@ permissions:
 jobs:
   engine:
     runs-on: ubuntu-latest
+    env:
+      PLASMO_AUDIO_CACHE: ${{ runner.temp }}/plasmo-audio
+      CARGO_BUILD_JOBS: 2
     steps:
       - uses: actions/checkout@v7
-      - name: Install Linux build dependencies
-        run: sudo apt-get update && sudo apt-get install -y libasound2-dev libudev-dev pkg-config cmake ninja-build qemu-user
+      - name: Install audio build and test tools
+        run: sudo apt-get update && sudo apt-get install -y libasound2-dev pkg-config cmake ninja-build qemu-user
       - uses: dtolnay/rust-toolchain@stable
         with:
+          toolchain: 1.99.1
           components: rustfmt, clippy
       - uses: Swatinem/rust-cache@v2
-      - name: Format
-        run: cargo fmt --all -- --check
-      - name: Clippy
-        run: cargo clippy --workspace --all-targets --locked -- -D warnings
-      - name: Engine tests
-        run: cargo test --workspace --locked
-      - name: Source-built noise suppression and spatial audio
-        run: cargo test --workspace --test hrtf --test denoise -- --ignored
-      - name: Source-built codec and DSP APIs without physical devices
-        run: cargo run --locked -p horizon-plasmo-engine --bin plasmo-voice-runtime -- --check
-      - name: Check development tool syntax
-        run: python3 -m py_compile tools/prepare_native_api.py tools/package_native_api.py tools/check_source_bundle.py tools/export_branding.py
-      - name: Source-built runtime on a baseline CPU without AVX
-        run: qemu-x86_64 -cpu qemu64 target/debug/plasmo-voice-runtime --check
-      - name: Missing CMake disables voice without failing the build
+      - run: cargo fmt --all -- --check
+      - run: cargo clippy --workspace --all-targets --locked -- -D warnings
+      - run: cargo test --workspace --locked
+      - name: Source-built DSP and null output, without physical devices
+        env:
+          ALSOFT_DRIVERS: "null"
+        run: cargo test --workspace --locked --test hrtf --test denoise --test device_output -- --ignored
+      - name: Codec APIs and baseline CPU without AVX
+        run: |
+          cargo run --locked -p horizon-plasmo-engine --bin plasmo-voice-runtime -- --check
+          qemu-x86_64 -cpu qemu64 target/debug/plasmo-voice-runtime --check
+      - name: Missing CMake disables only voice
         env:
           CMAKE: /missing/plasmo-test-cmake
+          PLASMO_AUDIO_CACHE: ${{ runner.temp }}/plasmo-no-cmake
         run: |
-          cargo test --locked -p horizon-plasmo-engine --test unavailable
+          cargo test --workspace --locked --test unavailable
           cargo run --locked -p horizon-plasmo-engine --bin plasmo-voice-runtime -- --expect-disabled missing_cmake
-          HORIZON_NATIVE_DATA_DIR="$(mktemp -d)" cargo run --locked -p horizon-plasmo-engine --bin plasmo-voice-runtime
-  unsupported-platform:
-    runs-on: macos-latest
-    steps:
-      - uses: actions/checkout@v7
-      - uses: dtolnay/rust-toolchain@stable
-      - uses: Swatinem/rust-cache@v2
-      - name: Unsupported platform still builds and explains why voice is disabled
-        run: |
-          cargo test --locked -p horizon-plasmo-engine --test unavailable
-          cargo run --locked -p horizon-plasmo-engine --bin plasmo-voice-runtime -- --expect-disabled unsupported_target
-          HORIZON_NATIVE_DATA_DIR="$(mktemp -d)" cargo run --locked -p horizon-plasmo-engine --bin plasmo-voice-runtime
-  native-bundle:
+      - name: Check development tools
+        run: python3 -m py_compile tools/*.py
+
+  sdk-source-and-package:
     runs-on: ubuntu-latest
     env:
       CARGO_BUILD_JOBS: 2
       CARGO_INCREMENTAL: 0
       CARGO_PROFILE_DEV_DEBUG: 0
-      CARGO_TARGET_DIR: ${{ github.workspace }}/.local/native-target
     steps:
       - uses: actions/checkout@v7
-      - uses: actions/checkout@v7
-        with:
-          repository: horizon-rust/horizon
-          ref: fdc87aecdbd116bf1e08adcd062fcbaea8c2e2ca
-          path: .local/horizon
-      - uses: actions/checkout@v7
-        with:
-          repository: horizon-rust/horizon-mixins
-          ref: 5a64af938ec86b00d53d16a408aabc0038fb3e57
-          path: .local/mixins
-      - name: Install Linux build dependencies
-        run: sudo apt-get update && sudo apt-get install -y libasound2-dev libudev-dev pkg-config cmake ninja-build
       - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: 1.99.1
+          components: rustfmt, clippy
       - uses: Swatinem/rust-cache@v2
-      - name: Build the exact Nightly tools
+      - name: Fetch exact reviewed checker
         run: |
-          cargo build --locked --manifest-path .local/horizon/Cargo.toml -p cargo-horizon-mod
-          cargo build --locked --manifest-path .local/mixins/Cargo.toml -p horizon-mixins-cli
-      - name: Apply the package, preserve the lock and check the trait adapter
+          mkdir -p .local/bin
+          curl --fail --location --retry 3 'https://github.com/horizon-rust/horizon-mods/releases/download/checker%40f00125f61f794aaa3d4e950d301f353b35b6ee3d/cargo-horizon-mod-f00125f61f794aaa3d4e950d301f353b35b6ee3d' -o .local/bin/cargo-horizon-mod
+          echo '2538650e0eb1285edef7775c083b7ca6cbdb82e124934aaa977ddfc02f5078e1  .local/bin/cargo-horizon-mod' | sha256sum --check
+          chmod +x .local/bin/cargo-horizon-mod
+      - name: Fetch signed SDK and check source-only artifact
+        run: python3 tools/package_sdk.py --tool .local/bin/cargo-horizon-mod
+      - name: Adapter format
+        run: rustfmt --check --edition 2024 mod/src/lib.rs
+      - name: Source API regression and independent RSA interoperability
+        run: python3 tools/check_sdk.py --interop
+      - name: Adapter Clippy
+        run: python3 tools/check_sdk.py --clippy
+      - uses: actions/upload-artifact@v4
+        with:
+          name: sdk-source-package
+          path: dist/
+          if-no-files-found: error
+
+  unsupported-platform:
+    runs-on: macos-latest
+    env:
+      PLASMO_AUDIO_CACHE: ${{ runner.temp }}/plasmo-audio
+    steps:
+      - uses: actions/checkout@v7
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: 1.99.1
+      - uses: Swatinem/rust-cache@v2
+      - name: Unsupported target explains why voice is disabled
         run: |
-          python3 tools/check_native_bundle.py --source .local/horizon \
-            --mixins .local/native-target/debug/horizon-mixins \
-            --mod-tool .local/native-target/debug/cargo-horizon-mod \
-            --work .local/bundle-check
+          cargo test --workspace --locked --test unavailable
+          cargo run --locked -p horizon-plasmo-engine --bin plasmo-voice-runtime -- --expect-disabled unsupported_target
+
   windows:
     runs-on: windows-latest
     steps:
@@ -95,15 +103,18 @@ jobs:
           install: mingw-w64-x86_64-gcc mingw-w64-x86_64-cmake mingw-w64-x86_64-ninja
       - uses: dtolnay/rust-toolchain@stable
         with:
+          toolchain: 1.99.1
           targets: x86_64-pc-windows-gnu
       - uses: Swatinem/rust-cache@v2
-      - name: Source-built Windows codec and DSP tests
+      - name: Source-built codec, DSP and null-output tests
         shell: pwsh
         run: |
           $env:Path = "C:\msys64\mingw64\bin;" + $env:Path
+          $env:PLASMO_AUDIO_CACHE = Join-Path $env:RUNNER_TEMP 'plasmo-audio'
+          $env:ALSOFT_DRIVERS = 'null'
           cargo test --workspace --locked --target x86_64-pc-windows-gnu
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          cargo test --workspace --locked --target x86_64-pc-windows-gnu --test hrtf --test denoise -- --ignored
+          cargo test --workspace --locked --target x86_64-pc-windows-gnu --test hrtf --test denoise --test device_output -- --ignored
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           cargo run --locked --target x86_64-pc-windows-gnu -p horizon-plasmo-engine --bin plasmo-voice-runtime -- --check
           exit $LASTEXITCODE
@@ -111,8 +122,7 @@ jobs:
         if: failure()
         shell: pwsh
         run: |
-          Get-ChildItem target -Recurse -Filter audio-build.log | ForEach-Object {
+          Get-ChildItem (Join-Path $env:RUNNER_TEMP 'plasmo-audio') -Recurse -Filter audio-build.log | ForEach-Object {
             Write-Output $_.FullName
-            Get-Content $_.FullName | Select-String -Pattern 'error:|fatal:|FAILED:|CMake Error|undefined reference|cannot find|not found|ninja:|windres:'
+            Get-Content $_.FullName | Select-Object -Last 80
           }
-          Get-ChildItem target -Recurse -Filter *.dll | Select-Object -ExpandProperty FullName

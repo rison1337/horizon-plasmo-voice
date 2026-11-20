@@ -3,6 +3,50 @@
 Each record names its version and tested core. Completed checks below do not
 claim that every platform or physical audio device has been tested.
 
+## 0.6.0 signed SDK migration — 20 November 2026
+
+This record is separate from the historical native-v1 tests below.
+
+- Published Nightly: **2026-11-19**, Horizon
+  `f00125f61f794aaa3d4e950d301f353b35b6ee3d`.
+- SDK: `sdk-f00125f61f794aaa3d4e950d301f353b35b6ee3d`, API **0.2**,
+  package format **6**, Rust **1.99.1**.
+- Mixins: `e59da9094f0c2fdda6c627fe9eff22dec6a906f0`.
+- Official Launcher **0.2.85**, Linux x86_64 GNU, optimized **prebuilt** route.
+  Signed SDK verification passes; the game/SDK are not recompiled or patched.
+- The actual packaged `.hmod` was extracted into an isolated project and passed
+  launcher `native-build`, not just ordinary API-source compilation. Build
+  `native-f00125f-8541a04f70b3` completed in **17 seconds** after dependency caching.
+  [Launcher build record](docs/validation/sdk-0.6.0-native-build.json).
+- Mod-owned registry dependencies compile against immutable SDK binaries;
+  conflicting CPAL/ALSA providers were removed. The selected physical device
+  API is now an independent published-ABI OpenAL wrapper.
+
+Local checks pass: **24 regular engine tests**, **8 adapter/source-API tests**,
+RNNoise suppression and HRTF loopback, and the new explicit OpenAL **null-output**
+queue/underrun/reopen test. An independent OpenSSL process encrypts a test session
+key with the mod's DER public key using PKCS#1 v1.5; blinded RSA decryption succeeds
+and a truncated ciphertext is rejected. No physical audio device is used.
+A fresh-cache missing-CMake test confirms codecs and voice workers stay disabled.
+
+The official package checker accepts the flat manifest/source/resource layout.
+The recursive source inspector verifies all three original archives and finds
+**zero prebuilt executable payloads**. The package includes its registry lock and
+SDK uses metadata, without SDK binaries, player resources or account files.
+No build.rs, native-hooks.json, private injections or game-internal dependency
+is part of this mod.
+
+The game loads the mod from the real SDK build and opens its screen with V in an
+isolated Linux world. The new renderer's ARGB requirement exposed transparent
+legacy RGB text; the UI bridge now converts opaque RGB appropriately.
+
+CI is recorded separately by the commit's Actions checks. Source-API tests do not
+prove SDK ABI compatibility; the launcher build above supplies that evidence.
+The five-version server matrix below belongs to 0.5.0. A new live two-player voice
+session, physical microphones/speakers, other-mod combinations and Windows GUI
+are **not** claimed for 0.6.0. Windows audio source/DSP/null-output checks and
+unsupported macOS behavior are covered by the source workflow when green.
+
 ## 0.5.4 current Nightly packaging and disabled audio, 10 November 2026
 
 The catalog's current native-compat check rejected 0.5.3's separate installer

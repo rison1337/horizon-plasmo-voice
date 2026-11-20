@@ -1,129 +1,101 @@
-<p align="center">
-  <img src="assets/icon-128.png" width="128" height="128" alt="Plasmo Voice for Horizon — pixel microphone" />
-</p>
-
+<p align="center"><img src="branding/icon-128.png" width="128" height="128" alt="Pixel microphone" /></p>
 <h1 align="center">Plasmo Voice for Horizon</h1>
-<p align="center">Proximity voice chat. Native Rust. Built for Horizon.</p>
-<p align="center">
-  <a href="LICENSE">MIT</a> ·
-  <a href="NATIVE_INSTALL.md">Installation</a> ·
-  <a href="VALIDATION.md">Tested behavior</a> ·
-  <a href="docs/DEVELOPMENT.md">Development</a>
-</p>
+<p align="center">Proximity voice chat · Native Rust · Horizon SDK</p>
 
-![Project banner](assets/github-social.png)
+![Project banner](branding/github-social.png)
 
-An **unofficial, independently written client** for servers running
-[Plasmo Voice](https://github.com/plasmoapp/plasmo-voice) 2.1. Talk to nearby
-players from Horizon, with positional sound, push to talk, and a familiar voice
-settings menu. This is a native **`.hnmod`**, built into the client by Horizon
-Launcher. It is written in Rust, not a Fabric or NeoForge JAR.
+An unofficial, independently written Rust client for servers running
+[Plasmo Voice](https://github.com/plasmoapp/plasmo-voice) 2.1.
 
-> **0.5.4 · Horizon native API 411 or newer**
-> The Hooks/Host integration uses officially registered Horizon APIs. Download
-> the `.hnmod` from [Releases](https://github.com/rison1337/horizon-plasmo-voice/releases).
-> One source package builds its audio dependencies on Linux x86_64 and Windows x64.
-> The [Horizon catalog submission](https://github.com/horizon-rust/horizon-mods/pull/305)
-> is pending review; publishing a release does not list it automatically.
+**0.6.0 uses the current Horizon SDK and a single source-only `.hmod`.**
+The launcher compiles the mod against the published game SDK. It does not rebuild
+Horizon. Legacy `.hnmod` packages and native API 411 are no longer used.
 
-## What you get
+[Download](https://github.com/rison1337/horizon-plasmo-voice/releases/tag/v0.6.0) ·
+[Installation](NATIVE_INSTALL.md) · [Validation](VALIDATION.md) ·
+[Development](docs/DEVELOPMENT.md) · [License](LICENSE)
 
-- **Proximity voice:** distance attenuation, stereo positioning, optional HRTF,
-  directional sources, and sound occlusion.
-- **Talk over menus:** PTT works while paused, in settings, inventory, chat, and
-  the mod menu. Losing window focus clears the held key.
-- **Clear indicators:** your microphone state stays above interfaces. Pixel
-  icons follow other players' heads, account for helmets, and disappear behind
-  obstructing blocks. Servers without Plasmo Voice do not show a connection icon.
-- **Player controls:** individual volume and mute, source/channel levels, and
-  Shift + RMB + mouse wheel adjustment. Player gain multiplies the proximity level.
-- **Six settings tabs:** Devices, Volume, Activation, Overlay, Advanced, Hotkeys.
-  Device selection, voice activation, key chords, microphone preview, and RNNoise.
-- **One package:** Linux x86_64 and Windows x64 source builds of Opus,
-  RNNoise, and OpenAL Soft. English and Russian in-game translations.
+## Features
+
+- Proximity voice, distance attenuation, stereo positioning, optional HRTF,
+  directional sources, occlusion and RNNoise suppression.
+- Push to talk over pause, settings, inventory, chat and voice interfaces.
+  A foreground microphone indicator distinguishes held PTT from transmission.
+- Six settings tabs: Devices, Volume, Activation, Overlay, Advanced, Hotkeys.
+  Microphone preview, device selection, voice activation and configurable bindings.
+- Player volume and mute; individual gain multiplies source and master gain.
+  Hold **Shift + RMB** and scroll while aiming at a player to adjust volume.
+  The volume indicator appears only after a change.
+- Pixel icons rendered with the player's current pose and the world's depth
+  buffer: fixed world size, helmet clearance, no retained screen projection.
+- Idle servers without a voice handshake show no connection animation.
+- English and Russian. One source package for Linux x86_64 and Windows x64 GNU.
+
+## Install
+
+Use Horizon Launcher **0.2.85 or newer**, with the published
+**2026-11-19 Nightly** (`f00125f61f794aaa3d4e950d301f353b35b6ee3d`).
+The package pins that SDK and Mixins `e59da9094f0c2fdda6c627fe9eff22dec6a906f0`.
+A future Nightly requires an SDK compatibility check; arbitrary newer builds
+are not promised.
+
+In the selected instance's Mods page, choose **Add from GitHub** and enter:
+
+```text
+https://github.com/rison1337/horizon-plasmo-voice/releases/tag/v0.6.0
+```
+
+Accept Horizon's native-code notice, build the instance's native mods, then Play.
+Alternatively, place the downloaded `.hmod` in `horizon-native-mods/` and build
+through the launcher. Keep one version enabled. Registry listing requires
+maintainer review and is separate from publishing this GitHub release.
+
+**First audio preparation needs C/C++, CMake and Linux ALSA development headers;
+Windows GNU also needs Ninja.** Audio libraries compile offline in a background
+worker from bundled, verified upstream source. Later starts reuse the instance's
+cache. Missing tools leave voice disabled with a translated explanation; install
+them and choose **Reconnect voice**. Restart the launcher if its PATH changed.
+macOS and Windows MSVC voice are unsupported. See [installation](NATIVE_INSTALL.md).
 
 ## Controls
 
 | Action | Default |
 | --- | --- |
-| Open voice settings | **V** |
+| Voice settings | **V** |
 | Push to talk | Hold **Left Alt** |
-| Toggle microphone mute | **M** |
-| Adjust the targeted player's volume | Hold **Shift + RMB** and scroll |
+| Microphone mute | **M** |
+| Targeted player volume | Hold **Shift + RMB**, scroll |
 
-Bindings can be changed in **Hotkeys**. Existing saved bindings take precedence.
-The local microphone preview is not sent to the server.
-The player-volume indicator appears only after the volume actually changes;
-holding RMB or Shift alone does not show it.
+Custom bindings saved in the mod's Hotkeys tab take precedence. Local microphone
+preview is not transmitted. Server compatibility follows Horizon's Minecraft
+protocol adapters; the voice mod does not patch inventory or enable old protocols.
 
-## Install
+## Testing and limits
 
-Put the `.hnmod` into your instance's `horizon-native-mods/`, enable
-`plasmo_voice` on the launcher's **Mods** page, select **Performance**, and
-**Build**. Then start the instance with **Play**. The post-build step installs
-and verifies the libraries compiled from source for the current operating system.
-Voice requires C/C++ compilers and CMake (Windows GNU also needs Ninja). If those
-tools are unavailable, or on unsupported platforms such as macOS, the mod still
-builds with voice disabled and shows the reason in its settings.
+0.6.0 passes an actual optimized launcher build against the exact signed SDK,
+engine/adapter regressions, independent OpenSSL key-exchange interoperability,
+source-built DSP and OpenAL null-output checks. Linux game/menu checks use isolated
+player data. CI covers Linux and Windows audio source builds and unsupported macOS.
 
-Use a Nightly with native API **411 or newer**. The release records the tested
-public source commit; compatible newer Nightlies can build it too.
-Source-build commands are in the [development guide](docs/DEVELOPMENT.md).
-Full instructions and platform requirements are in [NATIVE_INSTALL.md](NATIVE_INSTALL.md).
+The five-server audio matrix belongs to **0.5.0**, before this SDK migration.
+Windows GUI, physical audio devices and a new two-player live voice session are
+not claimed for 0.6.0. See [VALIDATION.md](VALIDATION.md) for precise evidence;
+[PARITY.md](PARITY.md) describes existing feature limits.
 
-**Minecraft version support belongs to Horizon.** For older servers supported
-by Horizon, explicitly set `HORIZON_OLDER_SERVERS=1` in your instance's launch
-**Environment variables**. The voice mod does not enable old protocols, replace
-item decoders, or change that environment variable. Horizon itself uses resources
-from Minecraft 26.3. See the [server compatibility checks](docs/SERVER_COMPATIBILITY.md)
-for tested versions and the remaining upstream inventory limitation.
-
-## In-game interface
-
-![English Hotkeys tab in the Horizon client](docs/screenshots/settings-hotkeys.png)
-
-Actual Horizon API-adapter screenshot from an isolated Linux LAN test.
-
-## Compatibility and testing
-
-The interoperability reference is released **Plasmo Voice 2.1.17 on Fabric
-1.21.11**. Original Plasmo Voice implementation code and graphic assets were
-not read or copied. This project is not affiliated with or endorsed by the
-Plasmo Voice, Horizon, Mojang, or Microsoft teams.
-
-Linux live checks include real two-way synthetic audio against Paper
-**1.21.10, 1.21.11, 26.1.2, 26.2 and 26.3**, plus pause-menu PTT and chest/item
-checks. An explicit horn instrument still fails in Horizon's two tested 1.21.x
-adapters; see the [matrix and upstream fix](docs/SERVER_COMPATIBILITY.md).
-Earlier checks cover PTT on eight screens, player volume, English UI, camera
-alignment, helmet/crouch clearance, and block-shape visibility.
-The engine has **24 regular tests**, two additional DSP checks, and the
-adapter has **7 regression tests**. [Source CI](https://github.com/rison1337/horizon-plasmo-voice/actions/runs/42878041030)
-covers Linux/Windows source-built codec/DSP tests, Linux QEMU without AVX,
-unsupported macOS and exact-Nightly bundle/adapter checks. Windows GUI and
-physical audio-device testing is still outstanding.
-
-See [VALIDATION.md](VALIDATION.md) and [PARITY.md](PARITY.md) for the evidence and
-limits. Pixel-for-pixel UI or bit-identical audio processing is not claimed.
-
-## Source layout
+## Source
 
 | Path | Purpose |
 | --- | --- |
-| `native-api/` | Hooks/Host adapter, settings UI, original in-game pixel icons |
-| `engine/` | Protocol, UDP/AES/Opus, device I/O, audio processing and spatial sound |
-| `engine/data/` | Verified upstream source archives, CMake/Cargo build rules, install payload |
-| `tools/` | Development staging, packaging, and branding exports |
-| `assets/` | Shared launcher/README icon and GitHub social preview artwork |
-| `publishing/` | Catalog entry and icon submitted for review |
+| `mod/` | Complete flat SDK project and packaged resources |
+| `mod/src/voice/` | Protocol, encryption, UDP, audio, source preparation |
+| `mod/src/sdk.rs` | Public ClientHost/Hooks bridge and entity rendering |
+| `mod/assets/plasmo_voice/audio/` | Unmodified source archives, hashes, licenses, CMake recipe |
+| `engine/` | Development test harness using the same voice source |
+| `tools/` | SDK tests, registry lock resolution and packaging |
+| `branding/` | Original project artwork |
 
-## License and credits
-
-The original Rust implementation is [MIT](LICENSE). Third-party runtime
-libraries retain their own licenses; notices and corresponding OpenAL source
-archives are included. The protocol reference and all attributions are in
-[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
-
-The [upstream Plasmo Voice project](https://github.com/plasmoapp/plasmo-voice)
-provides the server and original Java client. This repository provides an
-independent compatible Horizon client.
+The original Rust code and artwork are MIT. Opus, RNNoise and OpenAL Soft retain
+their own licenses and complete corresponding sources. See
+[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md). Original Plasmo Voice implementation
+sources and graphics were not copied. This project is not affiliated with Plasmo
+Voice, Horizon, Mojang or Microsoft.

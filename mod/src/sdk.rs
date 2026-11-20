@@ -147,10 +147,10 @@ impl VoiceHost for Bridge<'_> {
             .client_tab_list()
             .map(|v| v.entries)
             .unwrap_or_default();
-        let players: HashMap<_, _> = profiles
-            .iter()
-            .filter_map(|p| Some((h.player(p.uuid)?.entity().id(), (p.uuid, p.name.clone()))))
-            .collect();
+        // PlayerRef lookup is authoritative server state (plus the local
+        // client), not the client's remote-player entity inventory. Join
+        // client entity profile names with the client's tab-list identities.
+        let players: HashMap<_, _> = profiles.iter().map(|p| (p.name.clone(), p.uuid)).collect();
         let min = camera.position.map(|v| v - 96.);
         let max = camera.position.map(|v| v + 96.);
         let level = h.level(&camera.dimension);
@@ -162,13 +162,14 @@ impl VoiceHost for Bridge<'_> {
             .into_iter()
             .filter_map(|entity| {
                 let position = entity.position(h)?;
-                let player = players.get(&entity.id());
+                let name = entity.name(h);
+                let player = name.as_ref().and_then(|name| players.get(name));
                 let [yaw, pitch] = entity.rotation(h).unwrap_or([0., 0.]);
                 let bounds = entity.bounding_box(h).unwrap_or([position, position]);
                 Some(ui::NativeClientEntity {
                     id: entity.id(),
-                    player_uuid: player.map(|p| p.0),
-                    player_name: player.map(|p| p.1.clone()),
+                    player_uuid: player.copied(),
+                    player_name: player.and(name),
                     previous_position: previous(entity, position, tick),
                     position,
                     bounds,
@@ -405,19 +406,25 @@ pub(crate) fn paint(
                 let _ = draw.gui_tooltip(&lines, p);
             }
             ui::Paint::Face(uuid, rect) => {
-                if let Some(player) = host.player(uuid) {
-                    let _ = draw.push_clip(rect);
+                let entity = host
+                    .local_player()
+                    .filter(|p| p.uuid() == uuid)
+                    .map(|p| p.entity())
+                    .or_else(|| {
+                        Bridge::read(host)
+                            .client_entities()
+                            .into_iter()
+                            .find(|e| e.player_uuid == Some(uuid))
+                            .and_then(|e| host.entity(e.id))
+                    });
+                if let Some(entity) = entity {
                     let view = mod_api::GuiEntityView::new(
-                        rect,
+                        [rect[0], rect[1], rect[0] + rect[2], rect[1] + rect[3]],
                         rect[2] * 2.0,
-                        rect[3] * 1.2,
-                        mod_api::GuiEntityLook::Turned {
-                            yaw: 180.,
-                            pitch: 0.,
-                        },
+                        1.5,
+                        mod_api::GuiEntityLook::Turned { yaw: 0., pitch: 0. },
                     );
-                    let _ = draw.entity(&mod_api::GuiEntity::Existing(player.entity()), view);
-                    let _ = draw.pop_clip();
+                    let _ = draw.entity(&mod_api::GuiEntity::Existing(entity), view);
                 } else {
                     draw.sprite(
                         ui::tab_list::default_skin(uuid),

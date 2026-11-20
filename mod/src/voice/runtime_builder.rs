@@ -229,6 +229,8 @@ pub(crate) fn build(root: &Path, out: &Path, target: &str) -> Result<Vec<&'stati
         config.args([
             "-G",
             "Ninja",
+            "-DCMAKE_CXX_MODULE_STD=OFF",
+            "-DCMAKE_CXX_SCAN_FOR_MODULES=OFF",
             "-DCMAKE_SHARED_LINKER_FLAGS=-static -static-libgcc -static-libstdc++",
         ]);
         // A Windows Rust installation often has an MSVC host even when the

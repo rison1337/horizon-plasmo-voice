@@ -67,7 +67,7 @@ impl Hooks for Voice {
             );
         }
     }
-    fn render_frame_pre(&self, h: &mut dyn ClientHost, _: &mut mod_api::RenderFramePreEvent) {
+    fn client_tick_post(&self, h: &mut dyn ClientHost, _: &mut mod_api::ClientTickPostEvent) {
         runtime::frame(&mut Bridge::write(h));
     }
     fn client_disconnecting(&self, h: &dyn ClientHost, _: &mut mod_api::ClientDisconnectingEvent) {

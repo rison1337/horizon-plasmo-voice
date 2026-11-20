@@ -114,7 +114,7 @@ impl VoiceHost for Bridge<'_> {
             gui_hidden: !matches!(h.hud_mode(), mod_api::HudMode::AllVisible),
             gui_size: self.size,
             server_address: h.client_session().client_server().and_then(|v| v.address),
-            logged_in: h.local_player().is_some(),
+            logged_in: h.client_session().client_server().is_some(),
             world_partial_tick: camera.as_ref().map_or(1., |v| f64::from(v.partial_tick)),
             eye_position: camera.as_ref().map(|v| v.position),
             yaw: camera.as_ref().map_or(0., |v| v.yaw),
@@ -285,10 +285,21 @@ impl VoiceHost for Bridge<'_> {
             .unwrap_or_default()
     }
     fn setting(&self, id: &str, key: &str) -> Option<String> {
-        self.host().setting(id, key)
+        if id != crate::runtime::ID {
+            return None;
+        }
+        let path = mod_api::ConfigPath::new(&format!("{id}/{key}")).ok()?;
+        String::from_utf8(self.host().config_files().read(&path).ok()?).ok()
     }
     fn set_setting(&self, id: &str, key: &str, value: &str) {
-        self.host().set_setting(id, key, value);
+        if id != crate::runtime::ID {
+            return;
+        }
+        if let Ok(path) = mod_api::ConfigPath::new(&format!("{id}/{key}"))
+            && let Err(error) = self.host().config_files().write(&path, value.as_bytes())
+        {
+            eprintln!("Plasmo Voice: could not save {key}: {error:?}");
+        }
     }
     fn mod_key(&self, id: &str, key: &str, default: &str) -> String {
         let saved: HashMap<String, String> = self

@@ -247,6 +247,23 @@ pub(super) fn payload(game: &mut dyn Host, bytes: &[u8]) {
 }
 pub(super) fn frame(game: &mut dyn Host) {
     with_state(game, |game, state| {
+        if std::env::var_os("HORIZON_PLASMO_DIAGNOSTICS").is_some()
+            && state.last_diagnostic.elapsed() >= Duration::from_secs(1)
+        {
+            let context = game.client_state();
+            let data = serde_json::json!({
+                "enabled": on(game),
+                "server_present": context.as_ref().is_some_and(|v|v.server_address.is_some()),
+                "logged_in": context.as_ref().is_some_and(|v|v.logged_in),
+                "audio_unavailable": crate::audio_runtime::unavailable_reason(),
+                "audio_error": crate::audio_runtime::failure_detail(),
+                "worker": state.client.is_some(),
+                "status": format!("{:?}",state.status),
+                "pending_ui": state.ui.pending.len()
+            });
+            game.set_setting(ID, "connection.json", &data.to_string());
+            state.last_diagnostic = Instant::now();
+        }
         actions(game, state);
         flush_settings(game, state);
         let language = crate::ui::lang::code();

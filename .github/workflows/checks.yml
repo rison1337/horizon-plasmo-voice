@@ -130,5 +130,11 @@ jobs:
         run: |
           Get-ChildItem (Join-Path $env:RUNNER_TEMP 'plasmo-audio') -Recurse -Filter audio-build.log | ForEach-Object {
             Write-Output $_.FullName
-            Get-Content $_.FullName | Select-Object -Last 80
+            Get-Content $_.FullName | Select-Object -First 50
+            Get-Content $_.FullName | Select-Object -Last 160
           }
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: windows-audio-diagnostics
+          path: ${{ runner.temp }}/plasmo-audio/**/audio-build.log

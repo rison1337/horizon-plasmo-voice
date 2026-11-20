@@ -37,8 +37,11 @@ No build.rs, native-hooks.json, private injections or game-internal dependency
 is part of this mod.
 
 The game loads the mod from the real SDK build and opens its screen with V in an
-isolated Linux world. The new renderer's ARGB requirement exposed transparent
-legacy RGB text; the UI bridge now converts opaque RGB appropriately.
+isolated Linux world. A separate headless Gamescope display renders the final menu
+at 1280×720 without interfering with the user's desktop. The
+[English Devices screenshot](docs/screenshots/sdk-0.6.0-devices.png) confirms the
+text and controls are visible. The new renderer's ARGB requirement exposed
+transparent legacy RGB text; the UI bridge now converts opaque RGB appropriately.
 
 CI is recorded separately by the commit's Actions checks. Source-API tests do not
 prove SDK ABI compatibility; the launcher build above supplies that evidence.

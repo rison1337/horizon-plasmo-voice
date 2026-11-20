@@ -353,17 +353,8 @@ impl VoiceHost for Bridge<'_> {
         packet: crate::network::packets::play::Serverbound,
     ) -> Result<(), String> {
         let crate::network::packets::play::Serverbound::CustomPayload(p) = packet;
-        // The SDK owns raw-channel declaration/announcement; do not submit its
-        // protected minecraft:register service packet as arbitrary mod bytes.
-        if p.channel == "minecraft:register" {
-            return Ok(());
-        }
         self.writable()?
-            .send_payload_to_server(
-                &mod_api::PayloadId(p.channel),
-                mod_api::PayloadBytes(p.data),
-            )
-            .map(|_| ())
+            .send_packet(crate::network::plugin_packet(&p.channel, &p.data)?)
             .map_err(|e| format!("{e:?}"))
     }
 }

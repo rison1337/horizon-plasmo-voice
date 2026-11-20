@@ -1,4 +1,29 @@
 //! Mod-owned private protocol utilities, independent of Horizon's engine crates.
+
+/// A vanilla plugin-channel body. This deliberately uses the SDK's generic play
+/// packet API: Plasmo/Paper does not negotiate Horizon's registered transport.
+pub fn plugin_packet(channel: &str, data: &[u8]) -> Result<mod_api::ServerboundPlayPacket, String> {
+    if data.len() > 32767 {
+        return Err("plugin payload exceeds the serverbound limit".into());
+    }
+    mod_api::Identifier::parse(channel).map_err(|e| format!("{e:?}"))?;
+    let mut body = Vec::with_capacity(channel.len() + data.len() + 5);
+    let mut length = channel.len();
+    loop {
+        let byte = (length & 127) as u8;
+        length >>= 7;
+        body.push(byte | if length != 0 { 128 } else { 0 });
+        if length == 0 {
+            break;
+        }
+    }
+    body.extend_from_slice(channel.as_bytes());
+    body.extend_from_slice(data);
+    Ok(mod_api::ServerboundPlayPacket::new(
+        mod_api::Identifier::parse("minecraft:custom_payload").unwrap(),
+        body,
+    ))
+}
 pub mod packets {
     pub mod configuration {
         pub struct CustomPayload {
@@ -63,6 +88,17 @@ pub mod servers {
 
 #[cfg(test)]
 mod tests {
+    #[test]
+    fn paper_channel_announcement_contains_all_voice_capabilities() {
+        let packet = super::plugin_packet("minecraft:register", crate::protocol::REGISTER).unwrap();
+        assert_eq!(packet.id.to_string(), "minecraft:custom_payload");
+        assert_eq!(packet.body,
+            b"\x12minecraft:registerplasmo:voice/v2/installed\0plasmo:voice/v2/service\0plasmo:voice/v2");
+        let control = super::plugin_packet("plasmo:voice/v2", &[0, 1, 255]).unwrap();
+        assert_eq!(control.body, b"\x0fplasmo:voice/v2\0\x01\xff");
+        assert!(super::plugin_packet("plasmo:voice/v2", &vec![0; 32768]).is_err());
+    }
+
     #[test]
     #[ignore = "requires the OpenSSL command; checks the server's independent RSA format"]
     fn openssl_pkcs1v15_key_exchange() {

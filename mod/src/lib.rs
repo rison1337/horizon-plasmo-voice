@@ -66,9 +66,6 @@ impl Hooks for Voice {
                 mod_api::KeyRegistration::new(id, key).label(&format!("plasmo_voice.{label}")),
             );
         }
-        r.payload_handlers()
-            .registrar("1")
-            .play_raw(mod_api::PayloadId("plasmo:voice/v2".into()), None);
     }
     fn render_frame_pre(&self, h: &mut dyn ClientHost, _: &mut mod_api::RenderFramePreEvent) {
         runtime::frame(&mut Bridge::write(h));

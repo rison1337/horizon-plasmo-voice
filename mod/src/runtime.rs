@@ -227,6 +227,9 @@ fn ensure(game: &mut dyn Host, state: &mut State) -> bool {
     }
     if !state.registered {
         state.registered = send(game, "minecraft:register", protocol::REGISTER.to_vec());
+        if state.registered {
+            log::info!("Plasmo Voice: announced plugin channels to the server");
+        }
     }
     state.registered
 }
@@ -325,6 +328,9 @@ pub(super) fn frame(game: &mut dyn Host) {
                     state.pending_payloads.push_back(data);
                 }
                 Event::Status(status) => {
+                    if state.status != status {
+                        log::info!("Plasmo Voice: connection status {status:?}");
+                    }
                     if status == Status::Connected
                         && state.status != Status::Connected
                         && state.settings.visualize_on_join

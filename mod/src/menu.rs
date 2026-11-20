@@ -1107,7 +1107,7 @@ pub(super) fn render(
                         Slider::Player(*uuid),
                         s.player_volumes.get(uuid).copied().unwrap_or(1.),
                         1.,
-                        s.player_muted.contains(&uuid),
+                        s.player_muted.contains(uuid),
                         Some(
                             state
                                 .faces
